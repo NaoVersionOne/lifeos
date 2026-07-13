@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Life OS Tracker</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#1a1e26; --card2:#232936; --text:#e8eaf0; --dim:#8b93a7;
+    --accent:#4ade80; --accent2:#60a5fa; --warn:#fbbf24; --line:#2d3444;
+  }
+  @media (prefers-color-scheme: light){
+    :root{--bg:#f4f5f8;--card:#ffffff;--card2:#eef1f6;--text:#1a2030;--dim:#5b6478;--line:#dfe3ec;}
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Segoe UI,Roboto,sans-serif;padding-bottom:80px}
+  header{padding:18px 16px 8px;display:flex;justify-content:space-between;align-items:baseline}
+  header h1{font-size:19px;font-weight:700}
+  header .date{color:var(--dim);font-size:13px}
+  nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  nav button{flex:1;padding:12px 0 10px;background:none;border:none;color:var(--dim);font-size:12px;font-weight:600;cursor:pointer}
+  nav button.on{color:var(--accent)}
+  main{padding:8px 14px;max-width:640px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .card h2{font-size:15px;margin-bottom:10px}
+  .card h2 .sub{color:var(--dim);font-weight:400;font-size:12px;margin-left:6px}
+  .muted{color:var(--dim);font-size:12px}
+  .habit-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+  .habit-row:last-child{border-bottom:none}
+  .habit-name{font-size:14px}
+  .tick{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:none;color:transparent;font-size:16px;cursor:pointer;transition:.15s}
+  .tick.on{background:var(--accent);border-color:var(--accent);color:#0b1220}
+  .weekgrid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:4px;font-size:11px;align-items:center;margin-top:8px}
+  .weekgrid .h{color:var(--dim);text-align:center}
+  .dot{height:16px;border-radius:5px;background:var(--card2)}
+  .dot.on{background:var(--accent)}
+  .dot.half{background:var(--warn)}
+  .ex{background:var(--card2);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .ex .name{font-weight:600;font-size:14px}
+  .ex .scheme{color:var(--accent2);font-size:12px;margin:2px 0 6px}
+  .ex .last{color:var(--dim);font-size:12px;margin-bottom:6px}
+  .sets{display:flex;flex-wrap:wrap;gap:6px}
+  .set{display:flex;align-items:center;gap:3px}
+  .set input{width:52px;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:14px;text-align:center}
+  .set span{color:var(--dim);font-size:12px}
+  .btn{display:block;width:100%;padding:13px;border:none;border-radius:12px;background:var(--accent);color:#0b1220;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+  .btn.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+  .btn.small{width:auto;display:inline-block;padding:8px 14px;font-size:13px;margin-right:8px}
+  .pill{display:inline-block;background:var(--card2);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+  .pill.on{background:var(--accent2);color:#0b1220}
+  canvas{width:100%;height:160px}
+  .stat-row{display:flex;gap:10px;margin-bottom:12px}
+  .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+  .stat .v{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .l{font-size:11px;color:var(--dim);margin-top:2px}
+  textarea{width:100%;min-height:90px;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px;font-size:12px}
+  .hist{font-size:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .hist:last-child{border:none}
+  .hist .d{color:var(--dim);font-size:11px}
+  input[type=number].big{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;text-align:center}
+  .row{display:flex;gap:10px;align-items:center}
+  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--accent);color:#0b1220;padding:10px 18px;border-radius:22px;font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header><h1 id="title">Life OS</h1><div class="date" id="today-label"></div></header>
+<main id="view"></main>
+<nav>
+  <button data-tab="today" class="on">Today</button>
+  <button data-tab="train">Train</button>
+  <button data-tab="progress">Progress</button>
+  <button data-tab="data">Data</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- storage ---------- */
+const KEY="lifeos-v1";
+let DB=JSON.parse(localStorage.getItem(KEY)||"null")||{habits:{},workouts:[],weights:[],cardio:[],startDate:"2026-07-14"};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
+const iso=d=>d.toISOString().slice(0,10);
+const today=()=>iso(new Date());
+const toast=m=>{const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);};
+
+/* ---------- habits ---------- */
+const HABITS=[["p","Prayer & Scripture"],["t","Training"],["d","Deep work block"],["f","Family block present"],["c","Couple time"],["w","Writing (Mon)"],["s","Lights out on time"]];
+
+/* ---------- program ---------- */
+const PROGRAM={
+ A:{day:2,name:"Strength A — Squat + Push/Pull",ex:[
+   {n:["Goblet Squat","Barbell Back Squat","Barbell Back Squat"],s:[3,4,3]},
+   {n:["DB Bench Press (ss Row)","Barbell Bench (ss Row)","Barbell Bench (ss Row)"],s:[3,4,3]},
+   {n:["Chest-Supported Row","Chest-Supported Row","Chest-Supported Row"],s:[3,4,3]},
+   {n:["Lat Pulldown","Lat Pulldown","Lat Pulldown"],s:[3,3,3]},
+   {n:["Farmer Carry (m)","Farmer Carry (m)","Farmer Carry (m)"],s:[3,3,3]},
+   {n:["Plank (s)","Plank (s)","KB Swing finisher (reps)"],s:[3,3,4]}]},
+ B:{day:4,name:"Strength B — Hinge + Vertical",ex:[
+   {n:["Romanian Deadlift (DB)","Barbell RDL","Barbell RDL"],s:[3,4,3]},
+   {n:["Seated DB OHP (ss Pulldown)","Seated DB OHP (ss Pulldown)","Seated DB OHP (ss Pulldown)"],s:[3,4,3]},
+   {n:["Neutral Pulldown / Pull-up","Neutral Pulldown / Pull-up","Neutral Pulldown / Pull-up"],s:[3,4,3]},
+   {n:["Leg Curl","Leg Curl","Leg Curl"],s:[3,3,3]},
+   {n:["Pallof Press (per side)","Pallof Press (per side)","Incline-walk finisher (min)"],s:[3,3,1]}]},
+ C:{day:5,name:"Strength C — Lunge + Arms/Core",ex:[
+   {n:["DB Walking Lunge (per leg)","Bulgarian Split Squat","Bulgarian Split Squat"],s:[3,4,3]},
+   {n:["Incline DB Press (ss Cable Row)","Incline DB Press (ss Cable Row)","Incline DB Press (ss Cable Row)"],s:[3,4,3]},
+   {n:["Seated Cable Row","Seated Cable Row","Seated Cable Row"],s:[3,4,3]},
+   {n:["DB Curl (ss Pressdown)","DB Curl (ss Pressdown)","DB Curl (ss Pressdown)"],s:[3,2,3]},
+   {n:["Rope Pressdown","Rope Pressdown","Rope Pressdown"],s:[3,2,3]},
+   {n:["Hanging Knee Raise","Hanging Knee Raise","Farmer ladder finisher (m)"],s:[3,3,3]}]}
+};
+const SCHEMES=["Phase 1 · 3×8–10 · 60s rest","Phase 2 · 4×6–8 · 90s rest · heavier","Phase 3 · 3×10–12 · 45s rest + finisher"];
+const CARDIO={3:"Run/Walk — Zone 2 (C25K)",6:"Long Session — walk-run"};
+
+function weekNum(){const s=new Date(DB.startDate),n=new Date(today());return Math.max(1,Math.floor((n-s)/(7*864e5))+1);}
+function phaseIdx(){const w=weekNum();return w<=4?0:w<=8?1:2;}
+function isDeload(){const w=weekNum();return w===8||w===12||(w>12&&(w-12)%4===0);}
+function sessionForDay(dow){for(const k in PROGRAM)if(PROGRAM[k].day===dow)return k;return null;}
+function lastWorkout(sess){for(let i=DB.workouts.length-1;i>=0;i--)if(DB.workouts[i].session===sess)return DB.workouts[i];return null;}
+
+/* ---------- views ---------- */
+const view=document.getElementById("view");
+let tab="today";
+
+function render(){
+  document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+  ({today:renderToday,train:renderTrain,progress:renderProgress,data:renderData})[tab]();
+}
+
+/* ----- Today: habits ----- */
+function renderToday(){
+  const d=today(),h=DB.habits[d]||{};
+  let done=HABITS.filter(x=>h[x[0]]).length;
+  let html=`<div class="stat-row">
+    <div class="stat"><div class="v">${done}/7</div><div class="l">anchors today</div></div>
+    <div class="stat"><div class="v">${streak()}</div><div class="l">day streak (4+)</div></div>
+    <div class="stat"><div class="v">W${weekNum()}${isDeload()?"·DL":""}</div><div class="l">${isDeload()?"DELOAD week":"program week"}</div></div>
+  </div><div class="card"><h2>Today's anchors</h2>`;
+  for(const[k,n]of HABITS)html+=`<div class="habit-row"><span class="habit-name">${n}</span><button class="tick ${h[k]?"on":""}" data-h="${k}">✓</button></div>`;
+  html+=`</div><div class="card"><h2>This week</h2>${weekGrid()}</div>`;
+  view.innerHTML=html;
+  view.querySelectorAll(".tick").forEach(b=>b.onclick=()=>{const d=today();DB.habits[d]=DB.habits[d]||{};DB.habits[d][b.dataset.h]=!DB.habits[d][b.dataset.h];save();render();});
+}
+function streak(){let n=0,d=new Date();for(;;){const h=DB.habits[iso(d)]||{};if(HABITS.filter(x=>h[x[0]]).length>=4)n++;else if(iso(d)!==today())break;else if(HABITS.filter(x=>h[x[0]]).length<4&&n===0){}else break;d.setDate(d.getDate()-1);if(n>999)break;if(iso(d)<DB.startDate)break;}return n;}
+function weekGrid(){
+  const days=["M","T","W","T","F","S","S"];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  let g=`<div class="weekgrid"><span></span>${days.map(d=>`<span class="h">${d}</span>`).join("")}`;
+  for(const[k,n]of HABITS){g+=`<span class="h" style="text-align:left">${n.split(" ")[0]}</span>`;
+    for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const on=(DB.habits[iso(d)]||{})[k];g+=`<span class="dot ${on?"on":""}"></span>`;}}
+  return g+"</div>";
+}
+
+/* ----- Train ----- */
+let pickedSession=null;
+function renderTrain(){
+  const dow=new Date().getDay();
+  const sess=pickedSession||sessionForDay(dow);
+  let html="";
+  if(!sess){
+    const c=CARDIO[dow]||"Rest / recovery day";
+    html+=`<div class="card"><h2>${c}</h2><p class="muted" style="margin-bottom:10px">Log it if you did it — time and distance.</p>
+      <div class="row"><input type="number" class="big" id="c-min" placeholder="min"><input type="number" class="big" id="c-km" step="0.1" placeholder="km"></div>
+      <button class="btn" style="margin-top:12px" id="c-save">Save cardio</button></div>`;
+    html+=pickButtons();
+    view.innerHTML=html;
+    document.getElementById("c-save").onclick=()=>{DB.cardio.push({date:today(),min:+document.getElementById("c-min").value||0,km:+document.getElementById("c-km").value||0});save();toast("Cardio logged");render();};
+    bindPick();return;
+  }
+  const p=phaseIdx(),prog=PROGRAM[sess],last=lastWorkout(sess);
+  html+=`<div class="card"><h2>${prog.name}<span class="sub">${SCHEMES[p]}${isDeload()?" · DELOAD: half sets":""}</span></h2>`;
+  prog.ex.forEach((e,ei)=>{
+    const name=e.n[p],nsets=isDeload()?Math.max(1,Math.ceil(e.s[p]/2)):e.s[p];
+    let lastStr="—";
+    if(last){const le=last.entries.find(x=>x.ex===name);if(le)lastStr=le.sets.map(s=>`${s.w}×${s.r}`).join("  ");}
+    html+=`<div class="ex"><div class="name">${name}</div><div class="scheme">${nsets} sets</div><div class="last">Last: ${lastStr}</div><div class="sets">`;
+    for(let s=0;s<nsets;s++)html+=`<span class="set"><input type="number" inputmode="decimal" placeholder="kg" data-e="${ei}" data-s="${s}" data-t="w"><span>×</span><input type="number" inputmode="numeric" placeholder="reps" data-e="${ei}" data-s="${s}" data-t="r"></span>`;
+    html+=`</div></div>`;
+  });
+  html+=`<button class="btn" id="w-save">Finish & save workout</button></div>`;
+  html+=pickButtons(sess);
+  view.innerHTML=html;
+  document.getElementById("w-save").onclick=()=>{
+    const entries=[];
+    PROGRAM[sess].ex.forEach((e,ei)=>{
+      const name=e.n[p],sets=[];
+      view.querySelectorAll(`input[data-e="${ei}"][data-t="w"]`).forEach(wi=>{
+        const ri=view.querySelector(`input[data-e="${ei}"][data-s="${wi.dataset.s}"][data-t="r"]`);
+        if(wi.value&&ri.value)sets.push({w:+wi.value,r:+ri.value});});
+      if(sets.length)entries.push({ex:name,sets});});
+    if(!entries.length){toast("Nothing entered yet");return;}
+    DB.workouts.push({date:today(),session:sess,phase:p+1,entries});
+    DB.habits[today()]=DB.habits[today()]||{};DB.habits[today()].t=true;
+    save();pickedSession=null;toast("Workout saved 💪");tab="progress";setNav();render();
+  };
+  bindPick();
+}
+function pickButtons(cur){
+  let h=`<div class="card"><h2>Log a different session</h2>`;
+  for(const k in PROGRAM)h+=`<button class="btn small secondary" data-pick="${k}" ${cur===k?"disabled":""}>${k}</button>`;
+  h+=`<button class="btn small secondary" data-pick="cardio">Cardio</button></div>`;return h;
+}
+function bindPick(){view.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pickedSession=b.dataset.pick==="cardio"?null:b.dataset.pick;if(b.dataset.pick==="cardio")pickedSession="__c";render();});
+  if(pickedSession==="__c"){pickedSession=null;}}
+
+/* ----- Progress ----- */
+function renderProgress(){
+  const wts=DB.weights.slice(-60);
+  const wk=weeklyHabitTotals(8);
+  let html=`<div class="card"><h2>Bodyweight<span class="sub">Friday mornings</span></h2>
+    <div class="row" style="margin-bottom:10px"><input type="number" step="0.1" class="big" id="wt" placeholder="kg"><button class="btn small" id="wt-save" style="margin:0">Log</button></div>
+    <canvas id="wchart" width="600" height="160"></canvas></div>
+    <div class="card"><h2>Anchors per week<span class="sub">out of ${HABITS.length*7}</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
+    <div class="card"><h2>Recent workouts</h2>`;
+  DB.workouts.slice(-8).reverse().forEach(w=>{
+    const vol=w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0);
+    html+=`<div class="hist"><div class="d">${w.date} · Session ${w.session} · Phase ${w.phase}</div>${Math.round(vol).toLocaleString()} kg total volume · ${w.entries.length} exercises</div>`;});
+  if(!DB.workouts.length)html+=`<p class="muted">No workouts yet — Tuesday 6:15 is waiting.</p>`;
+  html+=`</div>`;
+  view.innerHTML=html;
+  document.getElementById("wt-save").onclick=()=>{const v=+document.getElementById("wt").value;if(!v)return;DB.weights.push({date:today(),kg:v});save();toast("Weight logged");render();};
+  drawLine("wchart",wts.map(w=>w.kg),wts.map(w=>w.date.slice(5)));
+  drawBars("hchart",wk.map(w=>w.n),wk.map(w=>w.label),HABITS.length*7);
+}
+function weeklyHabitTotals(nWeeks){
+  const out=[];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  for(let w=nWeeks-1;w>=0;w--){const start=new Date(mon);start.setDate(mon.getDate()-7*w);let n=0;
+    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const h=DB.habits[iso(d)]||{};n+=HABITS.filter(x=>h[x[0]]).length;}
+    out.push({label:iso(start).slice(5),n});}
+  return out;
+}
+function ctx2(id){const c=document.getElementById(id);const dpr=window.devicePixelRatio||1;const w=c.clientWidth;c.width=w*dpr;c.height=160*dpr;const x=c.getContext("2d");x.scale(dpr,dpr);return[x,w,160];}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function drawLine(id,vals,labels){
+  const[x,W,H]=ctx2(id);if(vals.length<2){x.fillStyle=css("--dim");x.font="12px -apple-system";x.fillText("Log two or more entries to see the trend.",10,80);return;}
+  const min=Math.min(...vals)-0.5,max=Math.max(...vals)+0.5,px=i=>30+(W-40)*i/(vals.length-1),py=v=>H-20-(H-40)*(v-min)/(max-min);
+  x.strokeStyle=css("--line");x.beginPath();x.moveTo(30,H-20);x.lineTo(W-10,H-20);x.stroke();
+  x.strokeStyle=css("--accent");x.lineWidth=2;x.beginPath();vals.forEach((v,i)=>i?x.lineTo(px(i),py(v)):x.moveTo(px(0),py(v)));x.stroke();
+  x.fillStyle=css("--accent");vals.forEach((v,i)=>{x.beginPath();x.arc(px(i),py(v),3,0,7);x.fill();});
+  x.fillStyle=css("--dim");x.font="10px -apple-system";x.fillText(String(max-0.5),2,py(max-0.5)+3);x.fillText(String(min+0.5),2,py(min+0.5)+3);
+}
+function drawBars(id,vals,labels,maxV){
+  const[x,W,H]=ctx2(id);const bw=(W-40)/vals.length;
+  vals.forEach((v,i)=>{const h=(H-40)*v/maxV;x.fillStyle=css("--accent2");x.fillRect(30+i*bw+4,H-20-h,bw-8,h);
+    x.fillStyle=css("--dim");x.font="9px -apple-system";x.fillText(labels[i],30+i*bw+4,H-6);
+    if(v)x.fillText(v,30+i*bw+bw/2-8,H-24-h);});
+}
+
+/* ----- Data ----- */
+function renderData(){
+  view.innerHTML=`<div class="card"><h2>Backup & sync</h2>
+    <p class="muted" style="margin-bottom:10px">Data lives on this device. Export weekly (Sunday Review) and store the file in iCloud Drive — that's your sync and your backup.</p>
+    <button class="btn secondary" id="exp">Export JSON</button>
+    <p class="muted" style="margin:12px 0 6px">Import (paste JSON):</p><textarea id="imp"></textarea>
+    <button class="btn secondary" id="impb" style="margin-top:8px">Import</button></div>
+    <div class="card"><h2>Program start date</h2>
+    <div class="row"><input type="date" id="sd" value="${DB.startDate}" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)"><button class="btn small" id="sdb" style="margin:0">Set</button></div>
+    <p class="muted" style="margin-top:8px">Drives week number, phase and deload flags. Stats: ${DB.workouts.length} workouts · ${Object.keys(DB.habits).length} habit days · ${DB.weights.length} weigh-ins.</p></div>`;
+  document.getElementById("exp").onclick=()=>{
+    const blob=new Blob([JSON.stringify(DB,null,1)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`lifeos-backup-${today()}.json`;a.click();toast("Exported");};
+  document.getElementById("impb").onclick=()=>{try{const d=JSON.parse(document.getElementById("imp").value);if(!d.habits)throw 0;DB=d;save();toast("Imported");render();}catch(e){toast("Invalid JSON");}};
+  document.getElementById("sdb").onclick=()=>{DB.startDate=document.getElementById("sd").value;save();toast("Start date set");render();};
+}
+
+/* ---------- nav ---------- */
+function setNav(){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;pickedSession=null;setNav();render();});
+render();
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
