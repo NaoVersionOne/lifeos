@@ -94,29 +94,27 @@ const HABITS=[["p","Prayer & Scripture"],["t","Training"],["d","Deep work block"
 
 /* ---------- program ---------- */
 const PROGRAM={
- A:{day:2,name:"Strength A — Squat + Push/Pull",ex:[
-   {n:["Goblet Squat","Barbell Back Squat","Barbell Back Squat"],s:[3,4,3]},
-   {n:["DB Bench Press (ss Row)","Barbell Bench (ss Row)","Barbell Bench (ss Row)"],s:[3,4,3]},
-   {n:["Chest-Supported Row","Chest-Supported Row","Chest-Supported Row"],s:[3,4,3]},
+ A:{day:2,name:"Shred A — Chest/Triceps/Abs",ex:[
+   {n:["Bench Press","Bench Press","Bench Press"],s:[4,4,3]},
+   {n:["Incline DB Press","Incline DB Press","Cable Fly"],s:[3,3,3]},
+   {n:["Dips (or Decline Press)","Dips (or Decline Press)","Dips (or Decline Press)"],s:[3,3,3]},
+   {n:["Close-Grip Bench","Close-Grip Bench","Rope Pressdown"],s:[3,3,3]},
+   {n:["Cable Crunch","Cable Crunch","Cable Crunch"],s:[3,3,3]}]},
+ B:{day:4,name:"Shred B — Shoulders/Legs/Calves",ex:[
+   {n:["Barbell Shoulder Press","Barbell Shoulder Press","Barbell Shoulder Press"],s:[4,4,3]},
+   {n:["Squat","Squat","Squat"],s:[4,4,3]},
+   {n:["Deadlift","Deadlift","Leg Press"],s:[3,3,3]},
+   {n:["Walking Lunge (per leg)","Walking Lunge (per leg)","Walking Lunge (per leg)"],s:[3,3,3]},
+   {n:["Standing Calf Raise","Standing Calf Raise","Standing Calf Raise"],s:[3,3,4]}]},
+ C:{day:5,name:"Shred C — Back/Traps/Biceps",ex:[
+   {n:["Barbell Bent-Over Row","Barbell Bent-Over Row","Barbell Bent-Over Row"],s:[4,4,3]},
    {n:["Lat Pulldown","Lat Pulldown","Lat Pulldown"],s:[3,3,3]},
-   {n:["Farmer Carry (m)","Farmer Carry (m)","Farmer Carry (m)"],s:[3,3,3]},
-   {n:["Plank (s)","Plank (s)","KB Swing finisher (reps)"],s:[3,3,4]}]},
- B:{day:4,name:"Strength B — Hinge + Vertical",ex:[
-   {n:["Romanian Deadlift (DB)","Barbell RDL","Barbell RDL"],s:[3,4,3]},
-   {n:["Seated DB OHP (ss Pulldown)","Seated DB OHP (ss Pulldown)","Seated DB OHP (ss Pulldown)"],s:[3,4,3]},
-   {n:["Neutral Pulldown / Pull-up","Neutral Pulldown / Pull-up","Neutral Pulldown / Pull-up"],s:[3,4,3]},
-   {n:["Leg Curl","Leg Curl","Leg Curl"],s:[3,3,3]},
-   {n:["Pallof Press (per side)","Pallof Press (per side)","Incline-walk finisher (min)"],s:[3,3,1]}]},
- C:{day:5,name:"Strength C — Lunge + Arms/Core",ex:[
-   {n:["DB Walking Lunge (per leg)","Bulgarian Split Squat","Bulgarian Split Squat"],s:[3,4,3]},
-   {n:["Incline DB Press (ss Cable Row)","Incline DB Press (ss Cable Row)","Incline DB Press (ss Cable Row)"],s:[3,4,3]},
-   {n:["Seated Cable Row","Seated Cable Row","Seated Cable Row"],s:[3,4,3]},
-   {n:["DB Curl (ss Pressdown)","DB Curl (ss Pressdown)","DB Curl (ss Pressdown)"],s:[3,2,3]},
-   {n:["Rope Pressdown","Rope Pressdown","Rope Pressdown"],s:[3,2,3]},
-   {n:["Hanging Knee Raise","Hanging Knee Raise","Farmer ladder finisher (m)"],s:[3,3,3]}]}
+   {n:["Seated Cable Row","Seated Cable Row","Seated Cable Row"],s:[3,3,3]},
+   {n:["Barbell Shrug","Barbell Shrug","Barbell Shrug"],s:[3,3,3]},
+   {n:["Barbell Curl","Barbell Curl","EZ-Bar Preacher Curl"],s:[3,3,3]}]}
 };
-const SCHEMES=["Phase 1 · 3×8–10 · 60s rest","Phase 2 · 4×6–8 · 90s rest · heavier","Phase 3 · 3×10–12 · 45s rest + finisher"];
-const RESTS=[60,90,45];
+const SCHEMES=["Wave 1 · 9–11 reps · 60s cardio between sets","Wave 2 · 6–8 reps heavier · 60s cardio between sets","Wave 3 · 12–15 reps · 60s cardio between sets"];
+const RESTS=[60,60,60];
 /* rest timer + beep */
 let actx=null,restIv=null;
 function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();const o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,actx.currentTime);o.start();o.stop(actx.currentTime+.3);}catch(e){}}
@@ -125,10 +123,10 @@ function startRest(btn){
   if(restIv)clearInterval(restIv);
   let left=RESTS[phaseIdx()];
   btn.classList.add("resting");
-  const tick=()=>{btn.textContent=`Resting… ${left}s (tap to restart)`;if(left--<=0){clearInterval(restIv);restIv=null;btn.classList.remove("resting");btn.textContent=`Rest timer — ${RESTS[phaseIdx()]}s`;beep();toast("Rest over — lift");}};
+  const tick=()=>{btn.textContent=`Cardio! ${left}s (tap to restart)`;if(left--<=0){clearInterval(restIv);restIv=null;btn.classList.remove("resting");btn.textContent=`Cardio accel — ${RESTS[phaseIdx()]}s`;beep();toast("Cardio done — lift");}};
   tick();restIv=setInterval(tick,1000);
 }
-const CARDIO={3:"Run/Walk — Zone 2 (C25K)",6:"Long Session — walk-run"};
+const CARDIO={3:"Run/Walk — Zone 2 (C25K) — out of gym",6:"Long Walk-Run — out of gym"};
 
 function weekNum(){const s=new Date(DB.startDate),n=new Date(today());return Math.max(1,Math.floor((n-s)/(7*864e5))+1);}
 function phaseIdx(){const w=weekNum();return w<=4?0:w<=8?1:2;}
@@ -194,7 +192,7 @@ function renderTrain(){
     for(let s=0;s<nsets;s++)html+=`<span class="set"><input type="number" inputmode="decimal" placeholder="kg" data-e="${ei}" data-s="${s}" data-t="w"><span>×</span><input type="number" inputmode="numeric" placeholder="reps" data-e="${ei}" data-s="${s}" data-t="r"></span>`;
     html+=`</div></div>`;
   });
-  html+=`<button class="btn secondary" id="rest-btn" style="margin-bottom:8px">Rest timer — ${RESTS[p]}s</button>`;
+  html+=`<button class="btn secondary" id="rest-btn" style="margin-bottom:8px">Cardio accel — ${RESTS[p]}s</button>`;
   html+=`<button class="btn" id="w-save">Finish & save workout</button></div>`;
   html+=pickButtons(sess);
   view.innerHTML=html;
