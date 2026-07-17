@@ -170,7 +170,7 @@ function weekGrid(){
 let pickedSession=null;
 function renderTrain(){
   const dow=new Date().getDay();
-  const sess=pickedSession||sessionForDay(dow);
+  const sess=pickedSession==="cardio"?null:(pickedSession||sessionForDay(dow));
   let html="";
   if(!sess){
     const c=CARDIO[dow]||"Rest / recovery day";
@@ -214,11 +214,11 @@ function renderTrain(){
 }
 function pickButtons(cur){
   let h=`<div class="card"><h2>Log a different session</h2>`;
+  if(pickedSession)h+=`<button class="btn small" data-pick="__back" style="background:var(--accent2);color:#0b1220">← Back to today</button>`;
   for(const k in PROGRAM)h+=`<button class="btn small secondary" data-pick="${k}" ${cur===k?"disabled":""}>${k}</button>`;
-  h+=`<button class="btn small secondary" data-pick="cardio">Cardio</button></div>`;return h;
+  h+=`<button class="btn small secondary" data-pick="cardio" ${pickedSession==="cardio"?"disabled":""}>Cardio</button></div>`;return h;
 }
-function bindPick(){view.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pickedSession=b.dataset.pick==="cardio"?null:b.dataset.pick;if(b.dataset.pick==="cardio")pickedSession="__c";render();});
-  if(pickedSession==="__c"){pickedSession=null;}}
+function bindPick(){view.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pickedSession=b.dataset.pick==="__back"?null:b.dataset.pick;render();});}
 
 /* ----- Progress ----- */
 function renderProgress(){
