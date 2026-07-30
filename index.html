@@ -85,7 +85,7 @@
 const KEY="lifeos-v1";
 let DB=JSON.parse(localStorage.getItem(KEY)||"null")||{habits:{},workouts:[],weights:[],cardio:[],startDate:"2026-07-14"};
 const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
-const iso=d=>d.toISOString().slice(0,10);
+const iso=d=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${dd}`;};
 const today=()=>iso(new Date());
 const toast=m=>{const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);};
 let viewDate=null;
@@ -192,7 +192,11 @@ function renderTrain(){
       <button class="btn" style="margin-top:12px" id="c-save">Save cardio</button></div>`;
     html+=pickButtons();
     view.innerHTML=html;
-    document.getElementById("c-save").onclick=()=>{DB.cardio.push({date:today(),min:+document.getElementById("c-min").value||0,km:+document.getElementById("c-km").value||0});save();toast("Cardio logged");render();};
+    document.getElementById("c-save").onclick=()=>{
+      DB.cardio.push({date:today(),min:+document.getElementById("c-min").value||0,km:+document.getElementById("c-km").value||0});
+      DB.habits[today()]=DB.habits[today()]||{};DB.habits[today()].t=true;
+      save();toast("Cardio logged");tab="progress";setNav();render();
+    };
     bindPick();return;
   }
   const p=phaseIdx(),prog=PROGRAM[sess],last=lastWorkout(sess);
@@ -313,12 +317,19 @@ function renderProgress(){
     <p class="muted" style="margin-top:6px">Amber dashed = goal checkpoints (event &lt;80kg, 76kg by 30 Sep). Blue = pace line.</p></div>
     <div class="card"><h2>8-week consistency</h2>${heatmap(56)}</div>
     <div class="card"><h2>Anchors per week<span class="sub">out of ${HABITS.length*7}</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
-    <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} sessions</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
-    <div class="card"><h2>Recent workouts</h2>`;
-  DB.workouts.slice(-8).reverse().forEach(w=>{
-    const vol=w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0);
-    html+=`<div class="hist"><div class="d">${w.date} · Session ${w.session} · Phase ${w.phase}</div>${Math.round(vol).toLocaleString()} kg total volume · ${w.entries.length} exercises</div>`;});
-  if(!DB.workouts.length)html+=`<p class="muted">No workouts yet — the app is waiting, not judging.</p>`;
+    <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
+    <div class="card"><h2>Recent activity</h2>`;
+  const recentActivity=[...DB.workouts.map(w=>({...w,type:"strength"})),...DB.cardio.map(c=>({...c,type:"cardio"}))]
+    .sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,8);
+  recentActivity.forEach(w=>{
+    if(w.type==="strength"){
+      const vol=w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0);
+      html+=`<div class="hist"><div class="d">${w.date} · Session ${w.session} · Phase ${w.phase}</div>${Math.round(vol).toLocaleString()} kg total volume · ${w.entries.length} exercises</div>`;
+    }else{
+      html+=`<div class="hist"><div class="d">${w.date} · Cardio</div>${w.min} min${w.km?` · ${w.km} km`:""}</div>`;
+    }
+  });
+  if(!recentActivity.length)html+=`<p class="muted">No workouts yet — the app is waiting, not judging.</p>`;
   html+=`</div>`;
   view.innerHTML=html;
   document.getElementById("wt-save").onclick=()=>{
