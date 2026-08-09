@@ -304,14 +304,25 @@ function drawWeightChart(id,weights){
   ws.forEach(w=>{const t=new Date(w.date+"T00:00:00").getTime();x.beginPath();x.arc(px(t),py(w.kg),3,0,7);x.fill();});
   x.fillStyle=css("--dim");x.font="10px -apple-system";x.fillText(max.toFixed(0),2,py(max)+3);x.fillText(min.toFixed(0),2,py(min)+3);
 }
-function habitGrid(nWeeks){
+function firstLoggedDay(){
+  const logged=Object.keys(DB.habits).filter(d=>Object.values(DB.habits[d]||{}).some(Boolean)).sort();
+  return logged.length?logged[0]:null;
+}
+function gridSpan(){
   const now=new Date(today()+"T00:00:00");
   const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
-  const logged=Object.keys(DB.habits).filter(d=>Object.values(DB.habits[d]||{}).some(Boolean)).sort();
-  const firstDay=logged.length?new Date(logged[0]+"T00:00:00"):now;
+  const fl=firstLoggedDay();
+  const firstDay=fl?new Date(fl+"T00:00:00"):now;
+  const fMon=new Date(firstDay);fMon.setDate(firstDay.getDate()-((firstDay.getDay()+6)%7));
+  let n=Math.floor((mon-fMon)/(7*864e5))+1;
+  const capped=n>26;if(capped)n=26;
+  return{now,mon,firstDay,nWeeks:Math.max(1,n),capped,firstLogged:fl};
+}
+function habitGrid(){
+  const{now,mon,firstDay,nWeeks}=gridSpan();
   const weeks=[];
   for(let w=nWeeks-1;w>=0;w--){const s=new Date(mon);s.setDate(mon.getDate()-7*w);weeks.push(s);}
-  let html=`<div style="display:grid;grid-template-columns:auto repeat(${nWeeks},1fr) auto;gap:3px;align-items:center;font-size:11px">`;
+  let html=`<div style="overflow-x:auto"><div style="display:grid;grid-template-columns:auto repeat(${nWeeks},minmax(16px,1fr)) auto;gap:3px;align-items:center;font-size:11px;min-width:min(100%,${60+nWeeks*20+30}px)">`;
   html+=`<span></span>`+weeks.map(s=>`<span style="color:var(--dim);text-align:center;font-size:9px">${iso(s).slice(5).replace("-","/")}</span>`).join("")+`<span style="color:var(--dim);font-size:9px">%</span>`;
   for(const[k,full]of HABITS){
     let hit=0,poss=0;
@@ -334,7 +345,7 @@ function habitGrid(nWeeks){
     row+=`<span style="color:${col};font-weight:700">${pct}</span>`;
     html+=row;
   }
-  return html+`</div><p class="muted" style="margin-top:8px">Each square = one week. Brighter = more days hit. Right column = % of days since you started logging. Green ≥70 · amber ≥40.</p>`;
+  return html+`</div></div><p class="muted" style="margin-top:8px">Each square = one week (week starting date above). Brighter = more days hit. Right column = % of days since you started logging. Green ≥70 · amber ≥40.</p>`;
 }
 function renderProgress(){
   const wts=DB.weights.slice(-60);
@@ -352,7 +363,7 @@ function renderProgress(){
     <canvas id="wchart" width="600" height="160"></canvas>
     <p class="muted" style="margin-top:6px">Amber dashed = goal checkpoints. Blue = pace line. Faint green = 7-day average (trend, ignore daily noise).</p>
     ${gs?goalLine(gs):""}</div>
-    <div class="card"><h2>Consistency by habit<span class="sub">last 8 weeks</span></h2>${habitGrid(8)}</div>
+    <div class="card"><h2>Consistency by habit<span class="sub">${(()=>{const g=gridSpan();if(!g.firstLogged)return "no data yet";const d=new Date(g.firstLogged+"T00:00:00");return g.capped?`last 26 weeks`:`since ${d.getDate()} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]}`;})()}</span></h2>${habitGrid()}</div>
     <div class="card"><h2>Anchors per week<span class="sub">out of ${HABITS.length*7}</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
     <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
     <div class="card"><h2>Recent activity</h2>`;
