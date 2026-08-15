@@ -181,7 +181,7 @@ function weekGrid(){
 }
 
 /* ----- Train ----- */
-let pickedSession=null;
+let pickedSession=null,progSess=null;
 function renderTrain(){
   const dow=new Date().getDay();
   const sess=pickedSession==="cardio"?null:(pickedSession||sessionForDay(dow));
@@ -347,6 +347,40 @@ function habitGrid(){
   }
   return html+`</div></div><p class="muted" style="margin-top:8px">Each square = one week (week starting date above). Brighter = more days hit. Right column = % of days since you started logging. Green ≥70 · amber ≥40.</p>`;
 }
+/* per-session strength progress. e1RM (Epley) normalises across the rep waves —
+   comparing raw kg between a 9-11 rep wave and a 6-8 rep wave would mislead. */
+function e1rm(s){return s.w*(1+s.r/30);}
+function bestSet(entry){let b=entry.sets[0];entry.sets.forEach(s=>{if(e1rm(s)>e1rm(b))b=s;});return b;}
+function sessionProgress(sess){
+  const hs=DB.workouts.filter(w=>w.session===sess).sort((a,b)=>a.date<b.date?-1:1);
+  const byEx={};
+  hs.forEach(w=>w.entries.forEach(e=>{(byEx[e.ex]=byEx[e.ex]||[]).push({date:w.date,best:bestSet(e)});}));
+  return{hs,byEx};
+}
+function sessionCard(){
+  const keys=Object.keys(PROGRAM);
+  const logged=keys.filter(k=>DB.workouts.some(w=>w.session===k));
+  if(!progSess||!keys.includes(progSess))progSess=logged[logged.length-1]||keys[0];
+  let h=`<div class="card"><h2>Session progress<span class="sub">per-lift trend</span></h2><div style="margin-bottom:10px">`;
+  keys.forEach(k=>{h+=`<button class="btn small ${k===progSess?"":"secondary"}" data-sess="${k}" style="${k===progSess?"":""}">${PROGRAM[k].name.split("—")[0].trim()}</button>`;});
+  h+=`</div>`;
+  const{hs,byEx}=sessionProgress(progSess);
+  if(!hs.length){h+=`<p class="muted">No ${progSess} sessions logged yet.</p></div>`;return h;}
+  h+=`<p class="muted" style="margin-bottom:8px">${hs.length} session${hs.length>1?"s":""} · ${hs[0].date.slice(5)} → ${hs[hs.length-1].date.slice(5)}</p>`;
+  h+=`<canvas id="schart" width="600" height="140"></canvas>
+      <p class="muted" style="margin:4px 0 10px">Total volume (kg lifted) per session.</p>`;
+  Object.keys(byEx).forEach(ex=>{
+    const a=byEx[ex];const f=a[0],l=a[a.length-1];
+    const pct=a.length>1?Math.round(100*(e1rm(l.best)-e1rm(f.best))/e1rm(f.best)):null;
+    const col=pct===null?"var(--dim)":pct>0?"var(--accent)":pct<0?"var(--warn)":"var(--dim)";
+    const arrow=pct===null?"":pct>0?"▲":pct<0?"▼":"—";
+    h+=`<div class="hist"><div class="d">${ex} · ${a.length} session${a.length>1?"s":""}</div>
+      ${a.length>1?`${f.best.w}×${f.best.r} → `:""}<b>${l.best.w}×${l.best.r}</b>
+      ${pct!==null?`<span style="color:${col};font-weight:700"> ${arrow} ${pct>0?"+":""}${pct}%</span>`:""}</div>`;
+  });
+  h+=`<p class="muted" style="margin-top:8px">Best set each session, compared by estimated 1-rep-max so the rep-range waves don't distort it.</p></div>`;
+  return h;
+}
 function renderProgress(){
   const wts=DB.weights.slice(-60);
   const wk=weeklyHabitTotals(8);
@@ -365,7 +399,8 @@ function renderProgress(){
     ${gs?goalLine(gs):""}</div>
     <div class="card"><h2>Consistency by habit<span class="sub">${(()=>{const g=gridSpan();if(!g.firstLogged)return "no data yet";const d=new Date(g.firstLogged+"T00:00:00");return g.capped?`last 26 weeks`:`since ${d.getDate()} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]}`;})()}</span></h2>${habitGrid()}</div>
     <div class="card"><h2>Anchors per week<span class="sub">out of ${HABITS.length*7}</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
-    <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
+    ${sessionCard()}
+    <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions, all types</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
     <div class="card"><h2>Recent activity</h2>`;
   const recentActivity=[...DB.workouts.map(w=>({...w,type:"strength"})),...DB.cardio.map(c=>({...c,type:"cardio"}))]
     .sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,8);
@@ -387,6 +422,12 @@ function renderProgress(){
     if(ex)ex.kg=v;else DB.weights.push({date:dt,kg:v});
     save();toast("Weight logged");render();
   };
+  view.querySelectorAll("[data-sess]").forEach(b=>b.onclick=()=>{progSess=b.dataset.sess;render();});
+  const sp=sessionProgress(progSess);
+  if(sp.hs.length&&document.getElementById("schart")){
+    const svols=sp.hs.map(w=>Math.round(w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0)));
+    drawBars("schart",svols,sp.hs.map(w=>w.date.slice(5)),Math.max(...svols,1));
+  }
   drawWeightChart("wchart",wts);
   drawBars("hchart",wk.map(w=>w.n),wk.map(w=>w.label),HABITS.length*7);
   if(vols.length)drawBars("vchart",vols,recentW.map(w=>w.date.slice(5)),Math.max(...vols,1));
