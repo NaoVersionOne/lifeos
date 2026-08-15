@@ -54,7 +54,8 @@
   .pill{display:inline-block;background:var(--card2);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
   .pill.on{background:var(--accent2);color:#0b1220}
   canvas{width:100%;height:160px}
-  .stat-row{display:flex;gap:10px;margin-bottom:12px}
+  .stat-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .stat-row.four .stat{flex:1 1 calc(50% - 5px)}
   .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
   .stat .v{font-size:22px;font-weight:700;color:var(--accent)}
   .stat .l{font-size:11px;color:var(--dim);margin-top:2px}
@@ -251,16 +252,21 @@ function goalStats(){
   const expected=first.kg+(GOALS[GOALS.length-1].kg-first.kg)*frac;
   const wk=ws.filter(w=>(new Date(latest.date+"T00:00:00")-new Date(w.date+"T00:00:00"))/864e5<=7);
   const delta7=wk.length>1?+(latest.kg-wk[0].kg).toFixed(1):null;
-  return{kgToAug:+(latest.kg-80).toFixed(1),kgToSep:+(latest.kg-76).toFixed(1),onPace:latest.kg<=expected+0.3,latest,first,delta7};
+  const total=ws.length>1?+(latest.kg-first.kg).toFixed(1):null;
+  const peak=ws.reduce((a,w)=>w.kg>a.kg?w:a,ws[0]);
+  const fromPeak=+(latest.kg-peak.kg).toFixed(1);
+  return{kgToAug:+(latest.kg-80).toFixed(1),kgToSep:+(latest.kg-76).toFixed(1),onPace:latest.kg<=expected+0.3,latest,first,delta7,total,peak,fromPeak};
 }
 function goalStatRow(gs){
-  const d7=gs.delta7===null?"—":(gs.delta7>0?"+":"")+gs.delta7;
-  const dCol=gs.delta7===null?"var(--accent)":(gs.delta7<=0?"var(--accent)":"var(--warn)");
-  return `<div class="stat-row">
-    <div class="stat"><div class="v">${gs.latest.kg}</div><div class="l">kg · ${gs.latest.date===today()?"today":gs.latest.date.slice(5)}</div></div>
-    <div class="stat"><div class="v" style="color:${dCol}">${d7}</div><div class="l">kg last 7 days</div></div>
+  const fmt=v=>v===null?"—":(v>0?"+":"")+v;
+  const col=v=>v===null?"var(--dim)":(v<0?"var(--accent)":v>0?"var(--warn)":"var(--dim)");
+  const md=ds=>{const d=new Date(ds+"T00:00:00");return `${d.getDate()} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]}`;};
+  return `<div class="stat-row four">
+    <div class="stat"><div class="v">${gs.latest.kg}</div><div class="l">kg · ${gs.latest.date===today()?"today":md(gs.latest.date)}</div></div>
+    <div class="stat"><div class="v" style="color:${col(gs.total)}">${fmt(gs.total)}</div><div class="l">kg total · since ${md(gs.first.date)}</div></div>
+    <div class="stat"><div class="v" style="color:${col(gs.delta7)}">${fmt(gs.delta7)}</div><div class="l">kg last 7 days</div></div>
     <div class="stat"><div class="v" style="color:${gs.onPace?"var(--accent)":"var(--warn)"}">${gs.onPace?"On pace":"Behind"}</div><div class="l">vs sprint line</div></div>
-  </div>`;
+  </div>${gs.fromPeak<0&&gs.peak.date!==gs.first.date?`<p class="muted" style="margin:-4px 0 12px">Down <b>${Math.abs(gs.fromPeak)} kg</b> from your peak of ${gs.peak.kg} kg on ${md(gs.peak.date)}.</p>`:""}`;
 }
 function goalLine(gs){
   const daysTo=ds=>Math.ceil((new Date(ds+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5);
