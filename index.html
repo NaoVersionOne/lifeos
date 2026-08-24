@@ -85,6 +85,9 @@
 /* ---------- storage ---------- */
 const KEY="lifeos-v1";
 let DB=JSON.parse(localStorage.getItem(KEY)||"null")||{habits:{},workouts:[],weights:[],cardio:[],startDate:"2026-07-14"};
+/* migration: new metric arrays, additive only — never touches existing data */
+(()=>{let ch=false;["waist","steps"].forEach(k=>{if(!Array.isArray(DB[k])){DB[k]=[];ch=true;}});
+ if(ch&&localStorage.getItem(KEY))localStorage.setItem(KEY,JSON.stringify(DB));})();
 const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
 const iso=d=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${dd}`;};
 const today=()=>iso(new Date());
@@ -94,8 +97,14 @@ function curViewDate(){return viewDate||today();}
 function addDays(dstr,n){const d=new Date(dstr+"T00:00:00");d.setDate(d.getDate()+n);return iso(d);}
 
 /* ---------- habits ---------- */
-const HABITS=[["p","Prayer & Scripture"],["t","Training"],["d","Deep work block"],["f","Family block present"],["c","Couple time"],["w","Writing / Reading"],["s","Lights out on time"]];
-const SHORT={p:"Prayer",t:"Train",d:"Deep",f:"Family",c:"Couple",w:"Write/Read",s:"Sleep"};
+/* [key, label, startDate?] — habits added later only count from their start date,
+   so adding one never retroactively damages historical percentages. */
+const HABITS=[["p","Prayer & Scripture"],["t","Training"],["d","Deep work block"],
+  ["f","Family block present"],["c","Couple time"],["w","Writing / Reading"],
+  ["s","In bed by 23:00"],["v","Vitamin D taken","2026-08-24"],
+  ["n","Steps 12k+","2026-08-24"]];
+const SHORT={p:"Prayer",t:"Train",d:"Deep",f:"Family",c:"Couple",w:"Write/Read",s:"Bed 23:00",v:"Vit D",n:"Steps"};
+function habitsOn(dstr){return HABITS.filter(h=>!h[2]||dstr>=h[2]);}
 
 /* ---------- program ---------- */
 const PROGRAM={
@@ -151,10 +160,11 @@ function render(){
 /* ----- Today: habits ----- */
 function renderToday(){
   const vd=curViewDate(),h=DB.habits[vd]||{};
-  let done=HABITS.filter(x=>h[x[0]]).length;
+  const act=habitsOn(vd);
+  let done=act.filter(x=>h[x[0]]).length;
   const isT=vd===today();
   let html=`<div class="stat-row">
-    <div class="stat"><div class="v">${done}/7</div><div class="l">anchors ${isT?"today":"logged"}</div></div>
+    <div class="stat"><div class="v">${done}/${act.length}</div><div class="l">anchors ${isT?"today":"logged"}</div></div>
     <div class="stat"><div class="v">${streak()}</div><div class="l">day streak (4+)</div></div>
     <div class="stat"><div class="v">W${weekNum()}${isDeload()?"·DL":""}</div><div class="l">${isDeload()?"DELOAD week":"program week"}</div></div>
   </div><div class="card">
@@ -163,7 +173,7 @@ function renderToday(){
       <h2 style="margin:0">${isT?"Today's anchors":vd}</h2>
       <button class="btn small secondary" id="d-next" style="margin:0" ${vd>=today()?"disabled":""}>›</button>
     </div>`;
-  for(const[k,n]of HABITS)html+=`<div class="habit-row"><span class="habit-name">${n}</span><button class="tick ${h[k]?"on":""}" data-h="${k}">✓</button></div>`;
+  for(const[k,n]of act)html+=`<div class="habit-row"><span class="habit-name">${n}</span><button class="tick ${h[k]?"on":""}" data-h="${k}">✓</button></div>`;
   if(!isT)html+=`<button class="btn secondary" id="d-today" style="margin-top:8px">Jump back to today</button>`;
   html+=`</div><div class="card"><h2>This week</h2>${weekGrid()}</div>`;
   view.innerHTML=html;
@@ -172,12 +182,14 @@ function renderToday(){
   const nx=document.getElementById("d-next");if(nx)nx.onclick=()=>{if(vd<today())viewDate=addDays(vd,1);render();};
   const jt=document.getElementById("d-today");if(jt)jt.onclick=()=>{viewDate=null;render();};
 }
-function streak(){let n=0,d=new Date();for(;;){const h=DB.habits[iso(d)]||{};if(HABITS.filter(x=>h[x[0]]).length>=4)n++;else if(iso(d)!==today())break;else if(HABITS.filter(x=>h[x[0]]).length<4&&n===0){}else break;d.setDate(d.getDate()-1);if(n>999)break;if(iso(d)<DB.startDate)break;}return n;}
+function streak(){let n=0,d=new Date();for(;;){const ds=iso(d),h=DB.habits[ds]||{};const hit=habitsOn(ds).filter(x=>h[x[0]]).length;if(hit>=4)n++;else if(ds!==today())break;else if(hit<4&&n===0){}else break;d.setDate(d.getDate()-1);if(n>999)break;if(iso(d)<DB.startDate)break;}return n;}
 function weekGrid(){
   const days=["M","T","W","T","F","S","S"];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
   let g=`<div class="weekgrid"><span></span>${days.map(d=>`<span class="h">${d}</span>`).join("")}`;
-  for(const[k,n]of HABITS){g+=`<span class="h" style="text-align:left">${n.split(" ")[0]}</span>`;
-    for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const on=(DB.habits[iso(d)]||{})[k];g+=`<span class="dot ${on?"on":""}"></span>`;}}
+  for(const[k,n,from]of HABITS){g+=`<span class="h" style="text-align:left">${SHORT[k]||n.split(" ")[0]}</span>`;
+    for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const ds=iso(d);
+      if(from&&ds<from){g+=`<span class="dot" style="opacity:.3"></span>`;continue;}
+      const on=(DB.habits[ds]||{})[k];g+=`<span class="dot ${on?"on":""}"></span>`;}}
   return g+"</div>";
 }
 
@@ -240,7 +252,11 @@ function pickButtons(cur){
 function bindPick(){view.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pickedSession=b.dataset.pick==="__back"?null:b.dataset.pick;render();});}
 
 /* ----- Progress ----- */
-const GOALS=[{date:"2026-08-30",kg:80,label:"Event"},{date:"2026-09-30",kg:76,label:"Sprint"}];
+/* Revised 24 Aug 2026 after full data analysis. TDEE ~2400 (BMR 1751 + measured active 441
+   + TEF). 1kg/wk would require eating ~1300 kcal — not survivable alongside 4 lifts/week.
+   0.75kg/wk is the honest ceiling that preserves muscle (~1% bodyweight/week). */
+const GOALS=[{date:"2026-09-30",kg:80,label:"Checkpoint"},{date:"2026-11-08",kg:76,label:"Target"}];
+const STEP_TARGET=12000;
 function goalStats(){
   if(!DB.weights.length)return null;
   const ws=[...DB.weights].sort((a,b)=>a.date<b.date?-1:1);
@@ -253,9 +269,10 @@ function goalStats(){
   const wk=ws.filter(w=>(new Date(latest.date+"T00:00:00")-new Date(w.date+"T00:00:00"))/864e5<=7);
   const delta7=wk.length>1?+(latest.kg-wk[0].kg).toFixed(1):null;
   const total=ws.length>1?+(latest.kg-first.kg).toFixed(1):null;
+  const days=(new Date(latest.date+"T00:00:00")-new Date(first.date+"T00:00:00"))/864e5;
   const peak=ws.reduce((a,w)=>w.kg>a.kg?w:a,ws[0]);
   const fromPeak=+(latest.kg-peak.kg).toFixed(1);
-  return{kgToAug:+(latest.kg-80).toFixed(1),kgToSep:+(latest.kg-76).toFixed(1),onPace:latest.kg<=expected+0.3,latest,first,delta7,total,peak,fromPeak};
+  return{kgToAug:+(latest.kg-80).toFixed(1),kgToSep:+(latest.kg-76).toFixed(1),onPace:latest.kg<=expected+0.3,latest,first,delta7,total,peak,fromPeak,days};
 }
 function goalStatRow(gs){
   const fmt=v=>v===null?"—":(v>0?"+":"")+v;
@@ -270,9 +287,11 @@ function goalStatRow(gs){
 }
 function goalLine(gs){
   const daysTo=ds=>Math.ceil((new Date(ds+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5);
-  const a=daysTo("2026-08-30"),s=daysTo("2026-09-30");
+  const a=daysTo(GOALS[0].date),s=daysTo(GOALS[1].date);
   const seg=(kg,label,days)=>kg<=0?`<b style="color:var(--accent)">${label} reached ✓</b>`:`<b>${kg} kg</b> to ${label}${days>0?` · ${days} days`:""}`;
-  return `<p class="muted" style="margin-top:8px">${seg(gs.kgToAug,"&lt;80kg (30 Aug)",a)} &nbsp;·&nbsp; ${seg(gs.kgToSep,"76kg (30 Sep)",s)}</p>`;
+  const rate=gs.total!==null&&gs.days>7?(gs.total/gs.days*7):null;
+  return `<p class="muted" style="margin-top:8px">${seg(gs.kgToAug,"80kg (30 Sep)",a)} &nbsp;·&nbsp; ${seg(gs.kgToSep,"76kg (8 Nov)",s)}</p>
+  ${rate!==null?`<p class="muted">Actual pace: <b style="color:${rate<=-0.6?"var(--accent)":"var(--warn)"}">${rate.toFixed(2)} kg/week</b> · target −0.75</p>`:""}`;
 }
 function drawWeightChart(id,weights){
   const[x,W,H]=ctx2(id);
@@ -330,15 +349,16 @@ function habitGrid(){
   for(let w=nWeeks-1;w>=0;w--){const s=new Date(mon);s.setDate(mon.getDate()-7*w);weeks.push(s);}
   let html=`<div style="overflow-x:auto"><div style="display:grid;grid-template-columns:auto repeat(${nWeeks},minmax(16px,1fr)) auto;gap:3px;align-items:center;font-size:11px;min-width:min(100%,${60+nWeeks*20+30}px)">`;
   html+=`<span></span>`+weeks.map(s=>`<span style="color:var(--dim);text-align:center;font-size:9px">${iso(s).slice(5).replace("-","/")}</span>`).join("")+`<span style="color:var(--dim);font-size:9px">%</span>`;
-  for(const[k,full]of HABITS){
+  for(const[k,full,from]of HABITS){
     let hit=0,poss=0;
+    const start=from&&from>iso(firstDay)?new Date(from+"T00:00:00"):firstDay;
     let row=`<span style="color:var(--text)">${SHORT[k]}</span>`;
     weeks.forEach(s=>{
       let n=0,days=0;
       for(let i=0;i<7;i++){
         const d=new Date(s);d.setDate(s.getDate()+i);
         if(d>now)break;
-        if(d<firstDay)continue;
+        if(d<start)continue;
         days++;if((DB.habits[iso(d)]||{})[k])n++;
       }
       hit+=n;poss+=days;
@@ -387,6 +407,45 @@ function sessionCard(){
   h+=`<p class="muted" style="margin-top:8px">Best set each session, compared by estimated 1-rep-max so the rep-range waves don't distort it.</p></div>`;
   return h;
 }
+/* --- Waist: with recomposition running, this is a truer signal than mass --- */
+function waistCard(){
+  const w=[...DB.waist].sort((a,b)=>a.date<b.date?-1:1);
+  let h=`<div class="card"><h2>Waist<span class="sub">weekly, at the navel</span></h2>`;
+  if(w.length){
+    const f=w[0],l=w[w.length-1];
+    const d=w.length>1?+(l.cm-f.cm).toFixed(1):null;
+    h+=`<div class="stat-row"><div class="stat"><div class="v">${l.cm}</div><div class="l">cm · ${l.date.slice(5)}</div></div>`;
+    if(d!==null)h+=`<div class="stat"><div class="v" style="color:${d<0?"var(--accent)":d>0?"var(--warn)":"var(--dim)"}">${d>0?"+":""}${d}</div><div class="l">cm since ${f.date.slice(5)}</div></div>`;
+    h+=`</div>`;
+  }
+  h+=`<div class="row" style="margin-bottom:10px">
+      <input type="date" id="wa-date" value="${today()}" max="${today()}" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)">
+      <input type="number" step="0.1" class="big" id="wa" placeholder="cm">
+      <button class="btn small" id="wa-save" style="margin:0">Log</button></div>`;
+  if(w.length>1)h+=`<canvas id="wachart" width="600" height="140"></canvas>`;
+  else h+=`<p class="muted">Measure at the navel, same time of day, relaxed — not sucked in. Fridays with the weigh-in.</p>`;
+  return h+`</div>`;
+}
+/* --- Steps: measured baseline 9,204/day. Target 12k ≈ +110-140 kcal/day --- */
+function stepsCard(){
+  const s=[...DB.steps].sort((a,b)=>a.date<b.date?-1:1);
+  const last14=s.slice(-14);
+  let h=`<div class="card"><h2>Steps<span class="sub">target ${STEP_TARGET.toLocaleString()}/day</span></h2>`;
+  if(last14.length){
+    const avg=last14.reduce((a,x)=>a+x.n,0)/last14.length;
+    const hitRate=Math.round(100*last14.filter(x=>x.n>=STEP_TARGET).length/last14.length);
+    h+=`<div class="stat-row"><div class="stat"><div class="v">${Math.round(avg).toLocaleString()}</div><div class="l">avg last ${last14.length}d</div></div>
+        <div class="stat"><div class="v" style="color:${hitRate>=70?"var(--accent)":"var(--warn)"}">${hitRate}%</div><div class="l">days at target</div></div></div>`;
+  }
+  h+=`<div class="row" style="margin-bottom:10px">
+      <input type="date" id="st-date" value="${today()}" max="${today()}" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)">
+      <input type="number" class="big" id="st" placeholder="steps">
+      <button class="btn small" id="st-save" style="margin:0">Log</button></div>`;
+  if(last14.length)h+=`<canvas id="stchart" width="600" height="140"></canvas>
+    <p class="muted" style="margin-top:4px">Amber line = 12k target. Monday is historically your weakest day (7,481 avg).</p>`;
+  else h+=`<p class="muted">Read from the Health app once a day. Baseline was 9,204/day — target 12,000.</p>`;
+  return h+`</div>`;
+}
 function renderProgress(){
   const wts=DB.weights.slice(-60);
   const wk=weeklyHabitTotals(8);
@@ -403,8 +462,10 @@ function renderProgress(){
     <canvas id="wchart" width="600" height="160"></canvas>
     <p class="muted" style="margin-top:6px">Amber dashed = goal checkpoints. Blue = pace line. Faint green = 7-day average (trend, ignore daily noise).</p>
     ${gs?goalLine(gs):""}</div>
+    ${waistCard()}
+    ${stepsCard()}
     <div class="card"><h2>Consistency by habit<span class="sub">${(()=>{const g=gridSpan();if(!g.firstLogged)return "no data yet";const d=new Date(g.firstLogged+"T00:00:00");return g.capped?`last 26 weeks`:`since ${d.getDate()} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]}`;})()}</span></h2>${habitGrid()}</div>
-    <div class="card"><h2>Anchors per week<span class="sub">out of ${HABITS.length*7}</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
+    <div class="card"><h2>Anchors per week<span class="sub">% of available anchors hit</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
     ${sessionCard()}
     <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions, all types</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
     <div class="card"><h2>Recent activity</h2>`;
@@ -428,6 +489,23 @@ function renderProgress(){
     if(ex)ex.kg=v;else DB.weights.push({date:dt,kg:v});
     save();toast("Weight logged");render();
   };
+  document.getElementById("wa-save").onclick=()=>{
+    const v=+document.getElementById("wa").value;if(!v)return;
+    const dt=document.getElementById("wa-date").value||today();
+    const ex=DB.waist.find(x=>x.date===dt); if(ex)ex.cm=v; else DB.waist.push({date:dt,cm:v});
+    save();toast("Waist logged");render();};
+  document.getElementById("st-save").onclick=()=>{
+    const v=+document.getElementById("st").value;if(!v)return;
+    const dt=document.getElementById("st-date").value||today();
+    const ex=DB.steps.find(x=>x.date===dt); if(ex)ex.n=v; else DB.steps.push({date:dt,n:v});
+    if(v>=STEP_TARGET){DB.habits[dt]=DB.habits[dt]||{};DB.habits[dt].n=true;}
+    save();toast("Steps logged");render();};
+  const wsorted=[...DB.waist].sort((a,b)=>a.date<b.date?-1:1);
+  if(wsorted.length>1&&document.getElementById("wachart"))
+    drawLine("wachart",wsorted.map(x=>x.cm),wsorted.map(x=>x.date.slice(5)));
+  const ssorted=[...DB.steps].sort((a,b)=>a.date<b.date?-1:1).slice(-14);
+  if(ssorted.length&&document.getElementById("stchart"))
+    drawBars("stchart",ssorted.map(x=>x.n),ssorted.map(x=>x.date.slice(5)),Math.max(STEP_TARGET,...ssorted.map(x=>x.n)),STEP_TARGET);
   view.querySelectorAll("[data-sess]").forEach(b=>b.onclick=()=>{progSess=b.dataset.sess;render();});
   const sp=sessionProgress(progSess);
   if(sp.hs.length&&document.getElementById("schart")){
@@ -435,15 +513,18 @@ function renderProgress(){
     drawBars("schart",svols,sp.hs.map(w=>w.date.slice(5)),Math.max(...svols,1));
   }
   drawWeightChart("wchart",wts);
-  drawBars("hchart",wk.map(w=>w.n),wk.map(w=>w.label),HABITS.length*7);
+  drawBars("hchart",wk.map(w=>w.pct),wk.map(w=>w.label),100);
   if(vols.length)drawBars("vchart",vols,recentW.map(w=>w.date.slice(5)),Math.max(...vols,1));
   else{const[x]=ctx2("vchart");x.fillStyle=css("--dim");x.font="12px -apple-system";x.fillText("Log a workout to see volume trend.",10,80);}
 }
 function weeklyHabitTotals(nWeeks){
   const out=[];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
-  for(let w=nWeeks-1;w>=0;w--){const start=new Date(mon);start.setDate(mon.getDate()-7*w);let n=0;
-    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const h=DB.habits[iso(d)]||{};n+=HABITS.filter(x=>h[x[0]]).length;}
-    out.push({label:iso(start).slice(5),n});}
+  for(let w=nWeeks-1;w>=0;w--){const start=new Date(mon);start.setDate(mon.getDate()-7*w);let n=0,poss=0;
+    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const ds=iso(d);
+      if(d>now)continue;
+      const h=DB.habits[ds]||{},act=habitsOn(ds);
+      n+=act.filter(x=>h[x[0]]).length;poss+=act.length;}
+    out.push({label:iso(start).slice(5),n,pct:poss?Math.round(100*n/poss):0});}
   return out;
 }
 function ctx2(id){const c=document.getElementById(id);const dpr=window.devicePixelRatio||1;const w=c.clientWidth;c.width=w*dpr;c.height=160*dpr;const x=c.getContext("2d");x.scale(dpr,dpr);return[x,w,160];}
@@ -456,11 +537,16 @@ function drawLine(id,vals,labels){
   x.fillStyle=css("--accent");vals.forEach((v,i)=>{x.beginPath();x.arc(px(i),py(v),3,0,7);x.fill();});
   x.fillStyle=css("--dim");x.font="10px -apple-system";x.fillText(String(max-0.5),2,py(max-0.5)+3);x.fillText(String(min+0.5),2,py(min+0.5)+3);
 }
-function drawBars(id,vals,labels,maxV){
+function drawBars(id,vals,labels,maxV,targetLine){
   const[x,W,H]=ctx2(id);const bw=(W-40)/vals.length;
-  vals.forEach((v,i)=>{const h=(H-40)*v/maxV;x.fillStyle=css("--accent2");x.fillRect(30+i*bw+4,H-20-h,bw-8,h);
+  vals.forEach((v,i)=>{const h=(H-40)*v/maxV;
+    x.fillStyle=(targetLine&&v>=targetLine)?css("--accent"):css("--accent2");
+    x.fillRect(30+i*bw+4,H-20-h,bw-8,h);
     x.fillStyle=css("--dim");x.font="9px -apple-system";x.fillText(labels[i],30+i*bw+4,H-6);
-    if(v)x.fillText(v,30+i*bw+bw/2-8,H-24-h);});
+    if(v)x.fillText(v>=1000?Math.round(v/1000)+"k":v,30+i*bw+bw/2-8,H-24-h);});
+  if(targetLine){const ty=H-20-(H-40)*targetLine/maxV;
+    x.strokeStyle=css("--warn");x.setLineDash([4,3]);x.lineWidth=1;
+    x.beginPath();x.moveTo(30,ty);x.lineTo(W-10,ty);x.stroke();x.setLineDash([]);}
 }
 
 /* ----- Data ----- */
