@@ -66,6 +66,82 @@
   input[type=number].big{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;text-align:center}
   .row{display:flex;gap:10px;align-items:center}
   .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--accent);color:#0b1220;padding:10px 18px;border-radius:22px;font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+  /* ===== redesign: Today ===== */
+  .ringwrap{display:flex;align-items:center;gap:16px}
+  .ring{width:88px;height:88px;flex:0 0 88px}
+  .ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+  .ring .bg{stroke:var(--card2)}
+  .ring .fg{stroke:var(--accent);transition:stroke-dashoffset .45s cubic-bezier(.3,1.2,.4,1)}
+  .ring text{fill:var(--text);font-size:26px;font-weight:700;text-anchor:middle;font-family:inherit}
+  .ringside .big{font-size:17px;font-weight:700;line-height:1.25}
+  .ringside .small{color:var(--dim);font-size:12.5px;margin-top:4px;line-height:1.4}
+  .daynav{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+  .daynav button{background:none;border:none;color:var(--dim);font-size:20px;padding:2px 10px;cursor:pointer;font-family:inherit}
+  .daynav button[disabled]{opacity:.25}
+  .daynav .lbl{font-size:12px;color:var(--dim);font-weight:600}
+  .anchor{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:none;border:none;
+    border-bottom:1px solid var(--line);padding:14px 2px;cursor:pointer;color:inherit;font-family:inherit}
+  .anchor:last-child{border-bottom:none}
+  .anchor .box{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;
+    align-items:center;justify-content:center;font-size:15px;color:transparent;transition:.15s}
+  .anchor.on .box{background:var(--accent);border-color:var(--accent);color:#0b1220}
+  .anchor .t{font-size:15.5px;font-weight:600;transition:.15s}
+  .anchor.on .t{color:var(--dim);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:var(--dim)}
+  .anchor .s{font-size:12px;color:var(--dim);margin-top:2px}
+  .done-note{text-align:center;color:var(--accent);font-size:13.5px;font-weight:600;padding:14px 0 2px}
+
+  /* ===== redesign: Progress ===== */
+  .sect{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);font-weight:700;margin:16px 2px 8px}
+  .sect:first-child{margin-top:4px}
+  .hero{display:flex;align-items:flex-end;gap:10px}
+  .hero .n{font-size:42px;font-weight:800;line-height:.95;letter-spacing:-.02em}
+  .hero .u{font-size:15px;color:var(--dim);padding-bottom:4px}
+  .delta{font-size:13px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--card2);margin-left:auto;white-space:nowrap}
+  .delta.good{color:var(--accent)} .delta.bad{color:var(--warn)} .delta.flat{color:var(--dim)}
+  .heat{display:grid;grid-template-rows:repeat(7,18px);grid-auto-flow:column;grid-auto-columns:18px;gap:4px;margin-top:12px;justify-content:space-between}
+  .heat i{border-radius:4px;background:var(--card2)}
+  .heat i.l1{background:var(--accent);opacity:.3}
+  .heat i.l2{background:var(--accent);opacity:.55}
+  .heat i.l3{background:var(--accent);opacity:.78}
+  .heat i.l4{background:var(--accent);opacity:1}
+  .heat i.future{background:transparent;border:1px dashed var(--line)}
+  .heatlab{display:flex;justify-content:space-between;color:var(--dim);font-size:10.5px;margin-top:6px}
+  .bar-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:inherit;
+    font-family:inherit;padding:9px 2px;cursor:pointer;text-align:left;border-bottom:1px solid var(--line)}
+  .bar-row:last-child{border-bottom:none}
+  .bar-row.sup .nm{color:var(--dim)}
+  .bar-row .nm{font-size:13.5px;flex:0 0 104px}
+  .bar-track{flex:1;height:8px;border-radius:6px;background:var(--card2);overflow:hidden;display:block}
+  .bar-fill{display:block;height:100%;border-radius:6px;background:var(--accent);transition:width .4s}
+  .bar-fill.ok{background:var(--accent2)}
+  .bar-fill.mid{background:var(--warn)}
+  .bar-row .pc{font-size:12.5px;color:var(--dim);flex:0 0 34px;text-align:right;font-variant-numeric:tabular-nums}
+  .subhead{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);font-weight:700;margin:14px 0 2px}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;
+    cursor:pointer;font-family:inherit;color:inherit}
+  .tile .v{font-size:20px;font-weight:800;color:var(--accent2);line-height:1.1}
+  .tile .l{font-size:10.5px;color:var(--dim);margin-top:4px;line-height:1.3}
+  .tile .chev{font-size:9px;color:var(--line);margin-top:3px}
+
+  /* ===== redesign: drill-down sheet ===== */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:10}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-height:84vh;overflow:auto;background:var(--card);
+    border-radius:18px 18px 0 0;border-top:1px solid var(--line);padding:8px 16px calc(24px + env(safe-area-inset-bottom));
+    transform:translateY(103%);transition:transform .26s cubic-bezier(.3,.9,.3,1);z-index:11}
+  .sheet.show{transform:translateY(0)}
+  .sheet .card{background:none;border:none;padding:0;margin:0}
+  .sheet .card h2{font-size:16px}
+  .grab{width:38px;height:4px;border-radius:4px;background:var(--line);margin:8px auto 12px}
+  .sheet h3{font-size:16px;margin-bottom:2px}
+  .sheet .sh-sub{color:var(--dim);font-size:12.5px;margin-bottom:14px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .kv:last-child{border-bottom:none}
+  .kv span:last-child{color:var(--dim);font-variant-numeric:tabular-nums;text-align:right}
+  .strip{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0 14px}
+  .strip i{width:calc((100% - 33px)/12);aspect-ratio:1;border-radius:3px;background:var(--card2)}
+  .strip i.on{background:var(--accent)} .strip i.na{background:transparent;border:1px dashed var(--line)}
   .toast.show{opacity:1}
 </style>
 </head>
@@ -79,6 +155,8 @@
   <button data-tab="data">Data</button>
 </nav>
 <div class="toast" id="toast"></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="grab"></div><div id="sheet-body"></div></div>
 
 <script>
 "use strict";
@@ -160,37 +238,87 @@ function render(){
   ({today:renderToday,train:renderTrain,progress:renderProgress,data:renderData})[tab]();
 }
 
-/* ----- Today: habits ----- */
+/* ----- Today: the anchors, and only what today asks -----
+   Four constants that never pause, plus the day's own ask. Taps only, ~15 seconds.
+   Vitamin D / Steps / Writing keep their data and live on Progress as supporting
+   metrics - they are inputs to the goal, not anchors of the life. */
+const CORE_A=["p","f","c","s"];
+const DAY_A={d:[2,3,4,5],t:[2,3,4,5,6]};
+const ANCHOR_KEYS=["p","d","t","f","c","s"];
+const SUPPORT_KEYS=["w","v","n"];
+const HLABEL=(()=>{const o={};HABITS.forEach(h=>o[h[0]]=h[1]);return o;})();
+const TRAIN_BY_DAY={2:"Strength A",3:"Run / walk — Zone 2",4:"Strength B",5:"Strength C",6:"Long walk-run"};
+const DEEP_BY_DAY={2:"Business B",3:"Business A",4:"Business B",5:"Business A"};
+const SUBL={p:"15 min, before the phone",f:"6:00–8:30pm, fully present",c:"8:30pm, screen-free",s:"wind-down, lights out 23:00"};
+const NEXTN={p:"prayer",d:"deep work",t:"training",f:"family",c:"couple time",s:"bed"};
+function dowOf(ds){return new Date(ds+"T00:00:00").getDay();}
+function askedOn(ds){const w=dowOf(ds);return ANCHOR_KEYS.filter(k=>CORE_A.includes(k)||DAY_A[k].includes(w));}
+function subFor(k,ds){const w=dowOf(ds);
+  if(k==="d")return (DEEP_BY_DAY[w]||"")+" · 5:15am";
+  if(k==="t")return TRAIN_BY_DAY[w]||"session";
+  return SUBL[k]||"";}
+function dayScoreA(ds){const h=DB.habits[ds]||{},a=askedOn(ds);return{done:a.filter(k=>h[k]).length,of:a.length};}
+function coreHeld(ds){const h=DB.habits[ds]||{};return CORE_A.every(k=>h[k]);}
+function mondayISO(ds){const d=new Date(ds+"T00:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d);}
+
 function renderToday(){
-  const vd=curViewDate(),h=DB.habits[vd]||{};
-  const act=habitsOn(vd);
-  let done=act.filter(x=>h[x[0]]).length;
-  const isT=vd===today();
-  let html=`<div class="stat-row">
-    <div class="stat"><div class="v">${done}/${act.length}</div><div class="l">anchors ${isT?"today":"logged"}</div></div>
-    <div class="stat"><div class="v">${streak()}</div><div class="l">day streak (4+)</div></div>
-    <div class="stat"><div class="v">W${weekNum()}${isDeload()?"·DL":""}</div><div class="l">${isDeload()?"DELOAD week":"program week"}</div></div>
-  </div><div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <button class="btn small secondary" id="d-prev" style="margin:0">‹</button>
-      <h2 style="margin:0">${isT?"Today's anchors":vd}</h2>
-      <button class="btn small secondary" id="d-next" style="margin:0" ${vd>=today()?"disabled":""}>›</button>
-    </div>`;
-  for(const[k,n]of act)html+=`<div class="habit-row"><span class="habit-name">${n}</span><button class="tick ${h[k]?"on":""}" data-h="${k}">✓</button></div>`;
-  if(!isT)html+=`<button class="btn secondary" id="d-today" style="margin-top:8px">Jump back to today</button>`;
-  html+=`</div><div class="card"><h2>This week</h2>${weekGrid()}</div>`;
+  const vd=curViewDate(),h=DB.habits[vd]||{},isT=vd===today();
+  const keys=askedOn(vd),done=keys.filter(k=>h[k]).length,n=keys.length;
+  const C=2*Math.PI*40,off=C*(1-(n?done/n:0));
+  const st=anchorStreak();
+  const nextK=keys.find(k=>!h[k]);
+  const line = done===n ? "Anchors held. That's the day."
+             : done===0 ? "Begin with the end in mind."
+             : (n-done)+" left — "+(NEXTN[nextK]||"")+" next.";
+  const md=ds=>{const d=new Date(ds+"T00:00:00");return d.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});};
+  let html=`<div class="card">
+    <div class="daynav">
+      <button id="d-prev">‹</button>
+      <span class="lbl">${isT?"TODAY":md(vd).toUpperCase()}</span>
+      <button id="d-next" ${vd>=today()?"disabled":""}>›</button>
+    </div>
+    <div class="ringwrap">
+      <svg class="ring" viewBox="0 0 100 100">
+        <circle class="bg" cx="50" cy="50" r="40"></circle>
+        <circle class="fg" cx="50" cy="50" r="40" transform="rotate(-90 50 50)"
+          stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"></circle>
+        <text x="50" y="59">${done}<tspan font-size="15" fill="var(--dim)">/${n}</tspan></text>
+      </svg>
+      <div class="ringside">
+        <div class="big">${line}</div>
+        <div class="small">${st} day${st===1?"":"s"} holding the four that never pause</div>
+      </div></div></div>
+    <div class="card">`;
+  for(const k of keys){
+    const on=!!h[k];
+    html+=`<button class="anchor ${on?"on":""}" data-h="${k}">
+      <span class="box">✓</span>
+      <span><span class="t">${HLABEL[k]}</span><br><span class="s">${subFor(k,vd)}</span></span></button>`;
+  }
+  if(done===n&&n)html+=`<div class="done-note">✓ Done. Close the app.</div>`;
+  html+=`</div>`;
+  if(!isT)html+=`<button class="btn secondary" id="d-today">Jump back to today</button>`;
   view.innerHTML=html;
-  view.querySelectorAll(".tick").forEach(b=>b.onclick=()=>{const dd=curViewDate();DB.habits[dd]=DB.habits[dd]||{};DB.habits[dd][b.dataset.h]=!DB.habits[dd][b.dataset.h];save();render();});
-  document.getElementById("d-prev").onclick=()=>{viewDate=addDays(vd,-1);render();};
-  const nx=document.getElementById("d-next");if(nx)nx.onclick=()=>{if(vd<today())viewDate=addDays(vd,1);render();};
-  const jt=document.getElementById("d-today");if(jt)jt.onclick=()=>{viewDate=null;render();};
+  view.querySelectorAll(".anchor").forEach(b=>b.onclick=()=>{
+    const dd=curViewDate();DB.habits[dd]=DB.habits[dd]||{};DB.habits[dd][b.dataset.h]=!DB.habits[dd][b.dataset.h];save();renderToday();});
+  document.getElementById("d-prev").onclick=()=>{viewDate=addDays(vd,-1);renderToday();};
+  document.getElementById("d-next").onclick=()=>{if(vd<today())viewDate=addDays(vd,1);renderToday();};
+  const jt=document.getElementById("d-today");if(jt)jt.onclick=()=>{viewDate=null;renderToday();};
 }
-function streak(){let n=0,d=new Date();for(;;){const ds=iso(d),h=DB.habits[ds]||{};const hit=habitsOn(ds).filter(x=>h[x[0]]).length;if(hit>=4)n++;else if(ds!==today())break;else if(hit<4&&n===0){}else break;d.setDate(d.getDate()-1);if(n>999)break;if(iso(d)<DB.startDate)break;}return n;}
+/* consecutive days the four constants were all held (today only counts once complete) */
+function anchorStreak(){
+  let n=0,d=today();
+  if(!coreHeld(d))d=addDays(d,-1);
+  for(;;){if(d<DB.startDate)break;if(!coreHeld(d))break;n++;d=addDays(d,-1);if(n>3650)break;}
+  return n;
+}
+function bestStreak(){let best=0,run=0,d=DB.startDate;
+  while(d<=today()){if(coreHeld(d)){run++;if(run>best)best=run;}else run=0;d=addDays(d,1);}return best;}
 function weekGrid(){
-  const days=["M","T","W","T","F","S","S"];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  const days=["M","T","W","T","F","S","S"];const mon=mondayISO(today());
   let g=`<div class="weekgrid"><span></span>${days.map(d=>`<span class="h">${d}</span>`).join("")}`;
   for(const[k,n,from]of HABITS){g+=`<span class="h" style="text-align:left">${SHORT[k]||n.split(" ")[0]}</span>`;
-    for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const ds=iso(d);
+    for(let i=0;i<7;i++){const ds=addDays(mon,i);
       if(from&&ds<from){g+=`<span class="dot" style="opacity:.3"></span>`;continue;}
       const on=(DB.habits[ds]||{})[k];g+=`<span class="dot ${on?"on":""}"></span>`;}}
   return g+"</div>";
@@ -450,76 +578,213 @@ function stepsCard(){
   return h+`</div>`;
 }
 function renderProgress(){
-  const wts=DB.weights.slice(-60);
-  const wk=weeklyHabitTotals(8);
+  view.innerHTML = `<div class="sect">Who I'm becoming</div>` + anchorPanel()
+                 + `<div class="sect">The body</div>`        + bodyPanel();
+  bindProgress();
+  if(DB.weights.length) drawWeightChart("wchart",DB.weights.slice(-90));
+}
+
+/* ---- panel 1: the anchors ---- */
+function anchorPanel(){
+  const r28=rateA(28),st=anchorStreak(),best=bestStreak();
+  const cls=st>=7?"good":st>0?"flat":"bad";
+  let h=`<div class="card">
+    <div class="hero"><div class="n">${r28}<span style="font-size:22px">%</span></div>
+      <div class="u">of what the last 28 days asked</div>
+      <div class="delta ${cls}">${st} day streak</div></div>
+    <div class="heat">${heatCells(12)}</div>
+    <div class="heatlab"><span>12 weeks ago</span><span>best run: ${best} days</span><span>today</span></div>
+  </div><div class="card"><h2>Anchor by anchor<span class="sub">last 28 days · tap for detail</span></h2>`;
+  for(const k of ANCHOR_KEYS)h+=barRow(k,false);
+  h+=`<div class="subhead">Supporting metrics</div>`;
+  for(const k of SUPPORT_KEYS)h+=barRow(k,true);
+  return h+`</div>`;
+}
+function barRow(k,sup){
+  const r=anchorRateK(k,28),pc=r.of?Math.round(100*r.hit/r.of):0;
+  const f=pc>=80?"":pc>=60?"ok":"mid";
+  return `<button class="bar-row ${sup?"sup":""}" data-anchor="${k}"><span class="nm">${HLABEL[k]}</span>
+    <span class="bar-track"><span class="bar-fill ${f}" style="width:${pc}%"></span></span>
+    <span class="pc">${r.of?pc+"%":"—"}</span></button>`;
+}
+function rateA(days){let hit=0,of=0,d=today();
+  for(let i=0;i<days;i++,d=addDays(d,-1)){if(d<DB.startDate)continue;const r=dayScoreA(d);hit+=r.done;of+=r.of;}
+  return of?Math.round(100*hit/of):0;}
+function habitStart(k){const h=HABITS.find(x=>x[0]===k);return h&&h[2]?h[2]:DB.startDate;}
+function appliesOn(k,ds){
+  if(ds<habitStart(k))return false;
+  if(ANCHOR_KEYS.includes(k))return askedOn(ds).includes(k);
+  return true;}
+function anchorRateK(k,days){let hit=0,of=0,d=today();
+  for(let i=0;i<days;i++,d=addDays(d,-1)){if(!appliesOn(k,d))continue;of++;if((DB.habits[d]||{})[k])hit++;}
+  return{hit,of};}
+function runOf(k){let n=0,d=today();
+  for(;;){if(d<DB.startDate)break;
+    if(!appliesOn(k,d)){d=addDays(d,-1);continue;}
+    if(!(DB.habits[d]||{})[k]){if(d===today()){d=addDays(d,-1);continue;}break;}
+    n++;d=addDays(d,-1);if(n>3650)break;}
+  return n;}
+function heatCells(weeks){
+  const first=addDays(mondayISO(today()),-7*(weeks-1));let out="";
+  for(let w=0;w<weeks;w++)for(let i=0;i<7;i++){
+    const s=addDays(first,w*7+i);
+    if(s>today()||s<DB.startDate){out+=`<i class="future"></i>`;continue;}
+    const r=dayScoreA(s),p=r.of?r.done/r.of:0;
+    const l=p===0?"":p<.4?"l1":p<.7?"l2":p<1?"l3":"l4";
+    out+=`<i class="${l}" title="${s} · ${r.done}/${r.of}"></i>`;}
+  return out;}
+
+/* ---- panel 2: the body ---- */
+function bodyPanel(){
   const gs=goalStats();
-  const recentW=DB.workouts.slice(-8);
-  const vols=recentW.map(w=>Math.round(w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0)));
-  let html=gs?goalStatRow(gs):"";
-  html+=`<div class="card"><h2>Bodyweight<span class="sub">Friday mornings, or backdate any day</span></h2>
-    <div class="row" style="margin-bottom:10px">
+  const daysTo=ds=>Math.ceil((new Date(ds+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5);
+  let h=`<div class="card" id="wcard" style="cursor:pointer">`;
+  if(gs){
+    const next=GOALS.find(g=>gs.latest.kg>g.kg)||GOALS[GOALS.length-1];
+    const toGo=+(gs.latest.kg-next.kg).toFixed(1);
+    const rate=gs.total!==null&&gs.days>7?(gs.total/gs.days*7):null;
+    const rcls=rate===null?"flat":rate<=-0.6?"good":rate<0?"flat":"bad";
+    h+=`<div class="hero"><div class="n">${gs.latest.kg}</div><div class="u">kg</div>
+        <div class="delta ${rcls}">${rate===null?"—":rate.toFixed(2)+" kg/wk"}</div></div>
+      <div class="muted" style="margin-top:6px">
+        ${toGo>0?`<b>${toGo} kg</b> to ${next.kg} by ${next.date.slice(8)}/${next.date.slice(5,7)} · ${daysTo(next.date)} days`
+                :`${next.kg} kg reached ✓`}
+        &nbsp;·&nbsp; <span style="color:${gs.onPace?"var(--accent)":"var(--warn)"}">${gs.onPace?"on pace":"behind pace"}</span></div>
+      <canvas id="wchart" width="600" height="160" style="margin-top:8px"></canvas>
+      <div class="muted">Green = weigh-ins · faint green = 7-day average · amber = goal checkpoints · blue = pace. Tap to log.</div>`;
+  }else{
+    h+=`<div class="hero"><div class="n">—</div><div class="u">kg</div></div>
+        <div class="muted" style="margin-top:6px">Tap to log your first weigh-in. Friday mornings.</div>`;
+  }
+  h+=`</div>`;
+
+  const wk=sessionsThisWeek(),vol=volumeTrend();
+  const wa=[...DB.waist].sort((a,b)=>a.date<b.date?-1:1),lw=wa.length?wa[wa.length-1]:null;
+  const st14=[...DB.steps].sort((a,b)=>a.date<b.date?-1:1).slice(-14);
+  const stAvg=st14.length?Math.round(st14.reduce((a,x)=>a+x.n,0)/st14.length):null;
+  h+=`<div class="tiles">
+    <button class="tile" id="t-sess"><div class="v">${wk}<span style="font-size:13px;color:var(--dim)">/5</span></div><div class="l">sessions<br>this week</div><div class="chev">▾</div></button>
+    <button class="tile" id="t-lift"><div class="v">${vol===null?"—":vol===0?"flat":(vol>0?"▲":"▼")+Math.abs(vol)+"%"}</div><div class="l">strength<br>trend</div><div class="chev">▾</div></button>
+    <button class="tile" id="t-prog"><div class="v">W${weekNum()}</div><div class="l">${isDeload()?"DELOAD week":"wave "+(phaseIdx()+1)}</div><div class="chev">▾</div></button>
+    <button class="tile" id="t-waist"><div class="v">${lw?lw.cm:"—"}</div><div class="l">waist<br>cm</div><div class="chev">▾</div></button>
+    <button class="tile" id="t-steps"><div class="v">${stAvg?(stAvg/1000).toFixed(1)+"k":"—"}</div><div class="l">steps avg<br>last ${st14.length||0}d</div><div class="chev">▾</div></button>
+    <button class="tile" id="t-act"><div class="v">${DB.workouts.length+DB.cardio.length}</div><div class="l">sessions<br>logged</div><div class="chev">▾</div></button>
+  </div>`;
+  return h;
+}
+function sessionsThisWeek(){const mon=mondayISO(today());let n=0;
+  for(let i=0;i<7;i++){const s=addDays(mon,i);if(s>today())break;if((DB.habits[s]||{}).t)n++;}return n;}
+function volOf(w){return w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0);}
+function volumeTrend(){const w=DB.workouts.slice(-6);if(w.length<4)return null;
+  const half=Math.floor(w.length/2),a=w.slice(0,half),b=w.slice(half);
+  const av=a.reduce((s,x)=>s+volOf(x),0)/a.length,bv=b.reduce((s,x)=>s+volOf(x),0)/b.length;
+  return av?Math.round(100*(bv-av)/av):null;}
+
+/* ---- drill-downs ---- */
+const scrim=document.getElementById("scrim"),sheetEl=document.getElementById("sheet"),sheetBody=document.getElementById("sheet-body");
+function openSheet(html){sheetBody.innerHTML=html;scrim.classList.add("show");sheetEl.classList.add("show");}
+function closeSheet(){scrim.classList.remove("show");sheetEl.classList.remove("show");}
+scrim.onclick=closeSheet;
+
+function bindProgress(){
+  view.querySelectorAll("[data-anchor]").forEach(b=>b.onclick=()=>sheetAnchor(b.dataset.anchor));
+  const wc=document.getElementById("wcard");if(wc)wc.onclick=sheetWeight;
+  document.getElementById("t-sess").onclick=sheetSessions;
+  document.getElementById("t-lift").onclick=sheetLifts;
+  document.getElementById("t-prog").onclick=sheetProgram;
+  document.getElementById("t-waist").onclick=sheetWaist;
+  document.getElementById("t-steps").onclick=sheetSteps;
+  document.getElementById("t-act").onclick=sheetActivity;
+}
+function sheetAnchor(k){
+  const r28=anchorRateK(k,28),r84=anchorRateK(k,84);
+  let strip="",d=addDays(today(),-83);
+  for(let i=0;i<84;i++,d=addDays(d,1))
+    strip += !appliesOn(k,d) ? `<i class="na"></i>` : `<i class="${(DB.habits[d]||{})[k]?"on":""}"></i>`;
+  const isA=ANCHOR_KEYS.includes(k);
+  openSheet(`<h3>${HLABEL[k]}</h3>
+    <div class="sh-sub">${isA?(CORE_A.includes(k)?"never pauses":"only on the days that ask it"):"supporting metric, not an anchor"}</div>
+    <div class="strip">${strip}</div>
+    <div class="kv"><span>Last 28 days</span><span>${r28.of?r28.hit+" of "+r28.of+" · "+Math.round(100*r28.hit/r28.of)+"%":"no data"}</span></div>
+    <div class="kv"><span>Last 12 weeks</span><span>${r84.of?r84.hit+" of "+r84.of+" · "+Math.round(100*r84.hit/r84.of)+"%":"no data"}</span></div>
+    <div class="kv"><span>Current run</span><span>${runOf(k)} in a row</span></div>
+    <div class="kv"><span>Rule</span><span>never miss twice</span></div>`);
+}
+function sheetWeight(){
+  const W=[...DB.weights].sort((a,b)=>a.date<b.date?-1:1).slice(-14).reverse();
+  openSheet(`<h3>Bodyweight</h3><div class="sh-sub">Friday mornings, or backdate any day. Judge the trend, never the day.</div>
+    <div class="row" style="margin-bottom:14px">
       <input type="date" id="wt-date" value="${today()}" max="${today()}" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)">
       <input type="number" step="0.1" class="big" id="wt" placeholder="kg">
-      <button class="btn small" id="wt-save" style="margin:0">Log</button>
-    </div>
-    <canvas id="wchart" width="600" height="160"></canvas>
-    <p class="muted" style="margin-top:6px">Amber dashed = goal checkpoints. Blue = pace line. Faint green = 7-day average (trend, ignore daily noise).</p>
-    ${gs?goalLine(gs):""}</div>
-    ${waistCard()}
-    ${stepsCard()}
-    <div class="card"><h2>Consistency by habit<span class="sub">${(()=>{const g=gridSpan();if(!g.firstLogged)return "no data yet";const d=new Date(g.firstLogged+"T00:00:00");return g.capped?`last 26 weeks`:`since ${d.getDate()} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]}`;})()}</span></h2>${habitGrid()}</div>
-    <div class="card"><h2>Anchors per week<span class="sub">% of available anchors hit</span></h2><canvas id="hchart" width="600" height="160"></canvas></div>
-    ${sessionCard()}
-    <div class="card"><h2>Workout volume<span class="sub">last ${recentW.length||0} strength sessions, all types</span></h2><canvas id="vchart" width="600" height="160"></canvas></div>
-    <div class="card"><h2>Recent activity</h2>`;
-  const recentActivity=[...DB.workouts.map(w=>({...w,type:"strength"})),...DB.cardio.map(c=>({...c,type:"cardio"}))]
-    .sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,8);
-  recentActivity.forEach(w=>{
-    if(w.type==="strength"){
-      const vol=w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0);
-      html+=`<div class="hist"><div class="d">${w.date} · Session ${w.session} · Phase ${w.phase}</div>${Math.round(vol).toLocaleString()} kg total volume · ${w.entries.length} exercises</div>`;
-    }else{
-      html+=`<div class="hist"><div class="d">${w.date} · Cardio</div>${w.min} min${w.km?` · ${w.km} km`:""}</div>`;
-    }
-  });
-  if(!recentActivity.length)html+=`<p class="muted">No workouts yet — the app is waiting, not judging.</p>`;
-  html+=`</div>`;
-  view.innerHTML=html;
+      <button class="btn small" id="wt-save" style="margin:0">Log</button></div>
+    ${GOALS.map(g=>`<div class="kv"><span>${g.label} · ${g.date}</span><span>${g.kg} kg</span></div>`).join("")}
+    <div class="subhead">Recent</div>
+    ${W.map(w=>`<div class="kv"><span>${w.date}</span><span>${w.kg} kg</span></div>`).join("")||`<p class="muted">No weigh-ins yet.</p>`}`);
   document.getElementById("wt-save").onclick=()=>{
     const v=+document.getElementById("wt").value;if(!v)return;
     const dt=document.getElementById("wt-date").value||today();
-    const ex=DB.weights.find(w=>w.date===dt);
-    if(ex)ex.kg=v;else DB.weights.push({date:dt,kg:v});
-    save();toast("Weight logged");render();
-  };
+    const ex=DB.weights.find(w=>w.date===dt);if(ex)ex.kg=v;else DB.weights.push({date:dt,kg:v});
+    save();closeSheet();toast("Weight logged");render();};
+}
+function sheetWaist(){
+  openSheet(`<h3>Waist</h3><div class="sh-sub">Weekly at the navel, same time of day, relaxed. Truer than mass while you recomposition.</div>${waistCard()}`);
   document.getElementById("wa-save").onclick=()=>{
     const v=+document.getElementById("wa").value;if(!v)return;
     const dt=document.getElementById("wa-date").value||today();
-    const ex=DB.waist.find(x=>x.date===dt); if(ex)ex.cm=v; else DB.waist.push({date:dt,cm:v});
-    save();toast("Waist logged");render();};
+    const ex=DB.waist.find(x=>x.date===dt);if(ex)ex.cm=v;else DB.waist.push({date:dt,cm:v});
+    save();closeSheet();toast("Waist logged");render();};
+  const ws=[...DB.waist].sort((a,b)=>a.date<b.date?-1:1);
+  if(ws.length>1&&document.getElementById("wachart"))drawLine("wachart",ws.map(x=>x.cm),ws.map(x=>x.date.slice(5)));
+}
+function sheetSteps(){
+  openSheet(`<h3>Steps</h3><div class="sh-sub">Read from Health once a day. Hitting ${STEP_TARGET.toLocaleString()} auto-ticks the anchor.</div>${stepsCard()}`);
   document.getElementById("st-save").onclick=()=>{
     const v=+document.getElementById("st").value;if(!v)return;
     const dt=document.getElementById("st-date").value||today();
-    const ex=DB.steps.find(x=>x.date===dt); if(ex)ex.n=v; else DB.steps.push({date:dt,n:v});
+    const ex=DB.steps.find(x=>x.date===dt);if(ex)ex.n=v;else DB.steps.push({date:dt,n:v});
     if(v>=STEP_TARGET){DB.habits[dt]=DB.habits[dt]||{};DB.habits[dt].n=true;}
-    save();toast("Steps logged");render();};
-  const wsorted=[...DB.waist].sort((a,b)=>a.date<b.date?-1:1);
-  if(wsorted.length>1&&document.getElementById("wachart"))
-    drawLine("wachart",wsorted.map(x=>x.cm),wsorted.map(x=>x.date.slice(5)));
-  const ssorted=[...DB.steps].sort((a,b)=>a.date<b.date?-1:1).slice(-14);
-  if(ssorted.length&&document.getElementById("stchart"))
-    drawBars("stchart",ssorted.map(x=>x.n),ssorted.map(x=>x.date.slice(5)),Math.max(STEP_TARGET,...ssorted.map(x=>x.n)),STEP_TARGET);
-  view.querySelectorAll("[data-sess]").forEach(b=>b.onclick=()=>{progSess=b.dataset.sess;render();});
+    save();closeSheet();toast("Steps logged");render();};
+  const ss=[...DB.steps].sort((a,b)=>a.date<b.date?-1:1).slice(-14);
+  if(ss.length&&document.getElementById("stchart"))
+    drawBars("stchart",ss.map(x=>x.n),ss.map(x=>x.date.slice(5)),Math.max(STEP_TARGET,...ss.map(x=>x.n)),STEP_TARGET);
+}
+function sheetLifts(){
+  openSheet(`<h3>Strength</h3><div class="sh-sub">Best set per session, compared by estimated 1RM so the rep waves don't distort it.</div>${sessionCard()}`);
+  sheetBody.querySelectorAll("[data-sess]").forEach(b=>b.onclick=()=>{progSess=b.dataset.sess;sheetLifts();});
   const sp=sessionProgress(progSess);
   if(sp.hs.length&&document.getElementById("schart")){
-    const svols=sp.hs.map(w=>Math.round(w.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+s.w*s.r,0),0)));
-    drawBars("schart",svols,sp.hs.map(w=>w.date.slice(5)),Math.max(...svols,1));
-  }
-  drawWeightChart("wchart",wts);
-  drawBars("hchart",wk.map(w=>w.pct),wk.map(w=>w.label),100);
-  if(vols.length)drawBars("vchart",vols,recentW.map(w=>w.date.slice(5)),Math.max(...vols,1));
-  else{const[x]=ctx2("vchart");x.fillStyle=css("--dim");x.font="12px -apple-system";x.fillText("Log a workout to see volume trend.",10,80);}
+    const sv=sp.hs.map(w=>Math.round(volOf(w)));
+    drawBars("schart",sv,sp.hs.map(w=>w.date.slice(5)),Math.max(...sv,1));}
 }
+function sheetSessions(){
+  const mon=mondayISO(today());
+  let rows="";
+  for(let i=0;i<7;i++){const s=addDays(mon,i);
+    const nm=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][i];
+    const did=(DB.habits[s]||{}).t;
+    const plan=TRAIN_BY_DAY[dowOf(s)]||"rest";
+    rows+=`<div class="kv"><span>${nm} · ${plan}</span><span>${s>today()?"—":did?"✓ done":"missed"}</span></div>`;}
+  openSheet(`<h3>This week's training</h3><div class="sh-sub">Target 5 sessions. Success is arriving in kit.</div>${rows}`);
+}
+function sheetProgram(){
+  openSheet(`<h3>Week ${weekNum()} of the block</h3>
+    <div class="sh-sub">${isDeload()?"Deload week — halve everything.":SCHEMES[phaseIdx()]}</div>
+    <div class="kv"><span>Started</span><span>${DB.startDate}</span></div>
+    <div class="kv"><span>Wave</span><span>${phaseIdx()+1} of 3</span></div>
+    <div class="kv"><span>Next deload</span><span>week ${nextDeload()}</span></div>
+    <div class="kv"><span>Logged</span><span>${DB.workouts.length} workouts · ${DB.cardio.length} cardio · ${DB.weights.length} weigh-ins</span></div>`);
+}
+function nextDeload(){let w=weekNum();while(!(w===8||w===12||(w>12&&(w-12)%4===0)))w++;return w;}
+function sheetActivity(){
+  const all=[...DB.workouts.map(w=>({...w,type:"s"})),...DB.cardio.map(c=>({...c,type:"c"}))]
+    .sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,20);
+  const rows=all.map(w=>w.type==="s"
+    ?`<div class="kv"><span>${w.date} · session ${w.session}</span><span>${Math.round(volOf(w)).toLocaleString()} kg · ${w.entries.length} lifts</span></div>`
+    :`<div class="kv"><span>${w.date} · cardio</span><span>${w.min} min${w.km?" · "+w.km+" km":""}</span></div>`).join("");
+  openSheet(`<h3>Recent activity</h3><div class="sh-sub">Last ${all.length} sessions, strength and cardio</div>
+    ${rows||`<p class="muted">Nothing logged yet — the app is waiting, not judging.</p>`}`);
+}
+
 function weeklyHabitTotals(nWeeks){
   const out=[];const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
   for(let w=nWeeks-1;w>=0;w--){const start=new Date(mon);start.setDate(mon.getDate()-7*w);let n=0,poss=0;
@@ -571,7 +836,7 @@ function renderData(){
 
 /* ---------- nav ---------- */
 function setNav(){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;pickedSession=null;viewDate=null;setNav();render();});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;pickedSession=null;viewDate=null;closeSheet();setNav();render();});
 render();
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js");
 </script>
