@@ -261,7 +261,7 @@ const ABX=["Abs & Boxing 10: 2 rounds — 40s dead bug · 40s side plank each si
 const EASY=" Easy = HR ≤146 on the Watch — walk until it drops. Quick, light steps.";
 function cardioFor(ds){const w=dowOf(ds),p=phaseOn(ds);
   if(inTrip(ds))return "Trip — hotel circuit (25 min): 5 rounds · 15 push-ups · 20 squats (pain-free depth) · 12 reverse lunges/leg · 30s plank · 30s fast march. 12k steps. Optional 20-min easy jog. Log the minutes.";
-  if(ds==="2026-11-26")return "Run 20 min very easy — the day before the test. Then "+ABX[2];
+  if(ds==="2026-11-26")return "MAF 2 km retest — 10 min easy, then 2 km at HR ≤146 (walk when over). Log the time in Test (Log a different session → Test). Then "+ABX[2];
   if(ds==="2026-11-28")return "parkrun 5K, 8:00 — your first finish line. Run-walk allowed, easy first 2 km. Log time + km.";
   if(ds>=BLOCK.start&&ds<=BLOCK.end){
     if(w===2||w===4)return "Run from the door — "+RUN_TXT[p][w===4?1:0]+"."+EASY+"<br><br>Then "+ABX[p]+".";
@@ -319,7 +319,7 @@ const TRAIN_BY_DAY={2:"Strength A",3:"Run / walk — Zone 2",4:"Strength B",5:"S
 const TRAIN_H7={1:"Gym · Lower + abs · 6:05",2:"Run from the door · 6:00 + abs/boxing",3:"Gym · Upper + abs · 6:05",4:"Run + strides · 6:00 + abs/boxing",5:"Gym · Full-body pump · 6:05",6:"Long run-walk · 7:00"};
 const BUILD_H7={1:"StorytimeByMe · make · 8:00–9:15",2:"Construction · shape · 7:45–8:35",3:"Construction · make · 8:00–9:15",4:"StorytimeByMe · shape · 7:45–8:35",5:"Big rock (chosen Sunday) · 8:00–9:15"};
 function planFor(ds){const w=dowOf(ds);
-  if(ds>=BLOCK.start){if(inTrip(ds))return w>=1&&w<=6?"Hotel circuit (trip)":"";if(ds===BLOCK.light)return"Run 20 min very easy";if(ds==="2026-11-28")return"parkrun 5K · 8:00";if(ds===BLOCK.end)return"FINAL TEST + photos";return TRAIN_H7[w]||"";}
+  if(ds>=BLOCK.start){if(inTrip(ds))return w>=1&&w<=6?"Hotel circuit (trip)":"";if(ds===BLOCK.light)return"MAF 2 km retest · 6:00";if(ds==="2026-11-28")return"parkrun 5K · 8:00";if(ds===BLOCK.end)return"FINAL TEST + photos";return TRAIN_H7[w]||"";}
   if(BLOCK.tests.includes(ds))return"Benchmark test";
   return TRAIN_BY_DAY[w]||"";}
 const DEEP_BY_DAY={2:"Business B",3:"Business A",4:"Business B",5:"Business A"};
@@ -475,10 +475,10 @@ function renderTest(){
   let html=`<div class="card"><h2>Benchmark test<span class="sub">baseline 10 Oct · final 27 Nov</span></h2>
     <p class="muted" style="margin-bottom:12px">First: weigh, waist at the navel, 4 photos (front, side, back, flexed) — same light, same spot.</p>
     <div class="ex"><div class="name">Push-ups</div><div class="scheme">max reps, one set</div><input type="number" inputmode="numeric" class="big" id="tp" placeholder="reps"></div>
-    <div class="ex"><div class="name">2 km row</div><div class="scheme">time, m:ss</div><input type="text" inputmode="decimal" class="big" id="tr" placeholder="m:ss" style="width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;text-align:center"></div>
+    <div class="ex"><div class="name">2 km run at ≤146 bpm (MAF)</div><div class="scheme">time, m:ss · walk when HR goes over</div><input type="text" inputmode="decimal" class="big" id="tr" placeholder="m:ss" style="width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;text-align:center"></div>
     <div class="ex"><div class="name">Plank</div><div class="scheme">max hold, seconds</div><input type="number" inputmode="numeric" class="big" id="tk" placeholder="sec"></div>
     <button class="btn" id="t-save">Save test</button>`;
-  if(T.length)html+=`<div class="subhead">Results</div>`+T.map(t=>`<div class="kv"><span>${t.date}</span><span>${t.pushups??"—"} push-ups · ${t.row||"—"} row · ${t.plank??"—"}s plank</span></div>`).join("");
+  if(T.length)html+=`<div class="subhead">Results</div>`+T.map(t=>`<div class="kv"><span>${t.date}</span><span>${t.pushups??"—"} push-ups · ${t.row||"—"} 2 km MAF · ${t.plank??"—"}s plank</span></div>`).join("");
   html+=`</div>`+pickButtons("test");
   view.innerHTML=html;
   document.getElementById("t-save").onclick=()=>{
@@ -915,7 +915,7 @@ function sheetProgram(){
     <div class="subhead">Weight line (Fridays)</div>
     ${LINE.map(([d,k])=>`<div class="kv"><span>${d.slice(5)}</span><span>${d==="2026-10-23"?"trip — skip":k+" kg"}</span></div>`).join("")}
     <div class="subhead">Benchmark tests</div>
-    ${T.length?T.map(t=>`<div class="kv"><span>${t.date}</span><span>${t.pushups??"—"} push-ups · ${t.row||"—"} row · ${t.plank??"—"}s plank</span></div>`).join(""):`<p class="muted">Baseline Sat 10 Oct — the Train tab opens the test that day.</p>`}`);
+    ${T.length?T.map(t=>`<div class="kv"><span>${t.date}</span><span>${t.pushups??"—"} push-ups · ${t.row||"—"} 2 km MAF · ${t.plank??"—"}s plank</span></div>`).join(""):`<p class="muted">Baseline Sat 10 Oct — the Train tab opens the test that day.</p>`}`);
 }
 function sheetActivity(){
   const all=[...DB.workouts.map(w=>({...w,type:"s"})),...DB.cardio.map(c=>({...c,type:"c"}))]
