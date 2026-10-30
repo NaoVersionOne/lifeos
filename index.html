@@ -191,63 +191,65 @@ const LEGACY={
  B:{name:"Shred B — Shoulders/Legs/Calves"},
  C:{name:"Shred C — Back/Traps/Biceps"}
 };
-/* Hardcore 7 shred block · 12 Oct – 27 Nov 2026.
-   Phase is set by DATE, not week number: Ignite (to 20 Oct) · trip 21–25 Oct · Hardcore (26 Oct–8 Nov) · Peak (9–25 Nov).
-   Each exercise: n = name per phase, s = sets per phase, r = reps/technique per phase, ss = superset with the next one. */
+/* Hardcore 7 v3 · 45-minute sessions (from 2 Nov 2026) · 12 Oct – 27 Nov 2026.
+   Gym phase by DATE: Ignite (to 25 Oct, history only) · Build (26 Oct – 15 Nov) · Peak (16–25 Nov).
+   Runs keep their own dates: BLOCK.runP2 / BLOCK.runP3.
+   Each exercise: n = name per phase, s = sets, r = reps/technique, ss = superset with the next one,
+   blk = block letter, x = in Express 20, top = top of rep range (drives the "add weight" hint), inc = kg jump,
+   pk = Peak top-set mode (first set heavy 6–8, then back-offs). */
 /* ===================== EDIT HERE when life changes =====================
    BLOCK dates · TRAIN_H7 / BUILD_H7 day labels · PROGRAM.day (1=Mon … 6=Sat)
    Office days Tue/Thu → runs on 2/4/6, gym on 1/3/5. Swap numbers here to move days.
    ======================================================================= */
 const BLOCK={start:"2026-10-12",end:"2026-11-27",tripFrom:"2026-10-21",tripTo:"2026-10-25",
-  p2:"2026-10-26",p3:"2026-11-09",light:"2026-11-26",tests:["2026-10-10","2026-11-27"],reentry:"2026-10-09"};
+  p2:"2026-10-26",p3:"2026-11-16",v3:"2026-11-02",runP2:"2026-10-26",runP3:"2026-11-09",light:"2026-11-26",tests:["2026-10-10","2026-11-27"],reentry:"2026-10-09"};
 const PROGRAM={
  LO:{day:1,name:"Lower — Legs (knee-managed) + abs",ex:[
-   {n:["Leg Press","Leg Press","Leg Press"],s:[4,4,5],r:["12 · cardio between sets","20/15/12/10 pyramid · cardio between sets","30-20-10-20-30 · cardio between sets"]},
-   {n:["Romanian Deadlift","Romanian Deadlift","Romanian Deadlift"],s:[4,4,4],r:["10","10–12","8–10 + rest-pause last set"]},
-   {n:["Box Squat","Box Squat","Box Squat"],s:[3,3,3],r:["10 · managed weight","10–12","12"]},
-   {n:["Hip Thrust","Hip Thrust","Hip Thrust"],s:[3,3,3],r:["12","12–15","15 + rest-pause last set"]},
-   {n:["Leg Curl","Leg Curl","Leg Curl"],s:[3,3,5],r:["12","15 + drop set","30-20-10-20-30"]},
-   {n:["Standing Calf Raise","Standing Calf Raise","Standing Calf Raise"],s:[4,4,4],r:["15","20","20/15/10 drop"],ss:true},
-   {n:["Cable Crunch","Cable Crunch","Cable Crunch"],s:[4,4,4],r:["15","15","20"]}],
-   fin:["Bike sprints 6× 20s on / 40s off","Bike sprints 8× 20s on / 40s off","Bike sprints 10× 20s on / 40s off"]},
+   {n:["Leg Press","Leg Press","Leg Press"],s:[4,4,4],r:["8–10 · rest 60–90s","8–10 · rest 60–90s","1 top set ×6–8, then 3×10 at 15% lighter · rest 60–90s"],blk:"A",x:true,pk:true,top:[10,10,8],inc:10},
+   {n:["Romanian Deadlift","Romanian Deadlift","Romanian Deadlift"],s:[3,3,3],r:["8–10","8–10","8–10"],blk:"B",x:true,ss:true,top:[10,10,10],inc:5},
+   {n:["Leg Curl","Leg Curl","Leg Curl"],s:[3,3,3],r:["10–12","10–12 + drop set last round","10–12 + rest-pause last round"],blk:"B",x:true,top:[12,12,12],inc:5},
+   {n:["Box Squat","Box Squat","Box Squat"],s:[3,3,3],r:["8–10 · managed weight","8–10 · managed weight","8–10 · managed weight"],blk:"C",ss:true,top:[10,10,10],inc:5},
+   {n:["Standing Calf Raise","Standing Calf Raise","Standing Calf Raise"],s:[3,3,3],r:["12–15","12–15","12–15 + drop set last round"],blk:"C",top:[15,15,15],inc:5},
+   {n:["Hip Thrust","Hip Thrust","Hip Thrust"],s:[3,3,3],r:["10–12","10–12","10–12"],blk:"D",ss:true,top:[12,12,12],inc:5},
+   {n:["Cable Crunch","Cable Crunch","Cable Crunch"],s:[3,3,3],r:["12–15","12–15","12–15"],blk:"D",top:[15,15,15],inc:5}],
+   fin:null},
  UB:{day:3,name:"Upper — Push/Pull + abs",ex:[
-   {n:["Bench Press","Bench Press","Bench Press"],s:[4,4,4],r:["10–12 · cardio between sets","20/15/12/10 pyramid · cardio between sets","8–10 + rest-pause last set"]},
-   {n:["Lat Pulldown","Lat Pulldown","Lat Pulldown"],s:[4,4,5],r:["10–12 · cardio between sets","20/15/12/10 pyramid · cardio between sets","30-20-10-20-30"]},
-   {n:["Incline DB Press","Incline DB Press","Incline DB Press"],s:[3,3,4],r:["12","12","12"],ss:true},
-   {n:["Cable Fly","Cable Fly","Cable Fly"],s:[3,3,4],r:["15","15 + drop set","15"]},
-   {n:["Barbell Bent-Over Row","Barbell Bent-Over Row","Barbell Bent-Over Row"],s:[3,3,3],r:["10","10–12","8–10 + rest-pause last set"]},
-   {n:["Barbell Shoulder Press","Barbell Shoulder Press","Barbell Shoulder Press"],s:[3,3,3],r:["10–12","10–12","10 + rest-pause last set"]},
-   {n:["Lateral Raise","Lateral Raise","Cable Lateral Raise"],s:[3,3,5],r:["15","15 + drop set","30-20-10-20-30"],ss:true},
-   {n:["Face Pull","Face Pull","Face Pull"],s:[3,3,3],r:["15","15","20"]},
-   {n:["Hanging Knee Raise","Hanging Knee Raise","Hanging Knee Raise"],s:[3,3,3],r:["12","15","15"]}],
-   fin:["Rower 5× 250m hard / 45s easy","Rower 6× 250m hard / 45s easy","Rower 7× 250m hard / 45s easy"]},
+   {n:["Bench Press","Bench Press","Bench Press"],s:[4,4,4],r:["8–10 · rest 60–90s","8–10 · rest 60–90s","1 top set ×6–8, then 3×10 at 15% lighter · rest 60–90s"],blk:"A",x:true,pk:true,top:[10,10,8],inc:2.5},
+   {n:["Barbell Bent-Over Row","Barbell Bent-Over Row","Barbell Bent-Over Row"],s:[3,3,3],r:["8–10","8–10","8–10"],blk:"B",x:true,ss:true,top:[10,10,10],inc:2.5},
+   {n:["Incline DB Press","Incline DB Press","Incline DB Press"],s:[3,3,3],r:["10–12","10–12","10–12"],blk:"B",x:true,top:[12,12,12],inc:2},
+   {n:["Lat Pulldown","Lat Pulldown","Lat Pulldown"],s:[3,3,3],r:["10–12","10–12","10–12 + rest-pause last round"],blk:"C",ss:true,top:[12,12,12],inc:5},
+   {n:["Barbell Shoulder Press","Barbell Shoulder Press","Barbell Shoulder Press"],s:[3,3,3],r:["8–10","8–10","8–10"],blk:"C",top:[10,10,10],inc:2.5},
+   {n:["Lateral Raise","Lateral Raise","Lateral Raise"],s:[3,3,3],r:["12–15 · triset →","12–15 + drop set last round · triset →","12–15 + drop set last round · triset →"],blk:"D",ss:true,top:[15,15,15],inc:1},
+   {n:["Face Pull","Face Pull","Face Pull"],s:[3,3,3],r:["15 · triset →","15 · triset →","15 + drop set last round · triset →"],blk:"D",ss:true,top:[15,15,15],inc:2.5},
+   {n:["Hanging Knee Raise","Hanging Knee Raise","Hanging Knee Raise"],s:[3,3,3],r:["12–15","12–15","12–15"],blk:"D",top:[15,15,15],inc:0}],
+   fin:null},
  FB:{day:5,name:"Full-body Pump — Gethin day + abs",ex:[
-   {n:["Incline Bench Press","Incline Bench Press","Incline Bench Press"],s:[4,4,4],r:["12 · cardio after each pair","12 · cardio after each pair","12 · giant set with the next three"],ss:true},
-   {n:["Chest-Supported Row","Chest-Supported Row","Chest-Supported Row"],s:[4,4,4],r:["12","12","12"]},
-   {n:["DB Shoulder Press","DB Shoulder Press","DB Shoulder Press"],s:[3,3,4],r:["12","12","12"],ss:true},
-   {n:["Neutral Pulldown","Neutral Pulldown","Neutral Pulldown"],s:[3,3,4],r:["12","12","12"]},
-   {n:["Reverse Lunge (per leg)","Reverse Lunge (per leg)","Reverse Lunge (per leg)"],s:[3,3,3],r:["10/leg","12/leg","12/leg"],ss:true},
-   {n:["Kettlebell Swing","Kettlebell Swing","Kettlebell Swing"],s:[3,3,3],r:["15","20","20"]},
-   {n:["Dips (or Decline Press)","Dips (or Decline Press)","Dips (or Decline Press)"],s:[3,3,3],r:["max","max","max + rest-pause"]},
-   {n:["Barbell Curl","Barbell Curl","Barbell Curl"],s:[3,3,4],r:["12 · triset →","12–15 · triset →","15 · triset →"],ss:true},
-   {n:["Rope Pressdown","Rope Pressdown","Rope Pressdown"],s:[3,3,4],r:["12","12–15","15"],ss:true},
-   {n:["Hammer Curl","Hammer Curl","Hammer Curl"],s:[3,3,4],r:["12","12–15","15"]},
-   {n:["Cable Lateral Raise","Cable Lateral Raise","Cable Lateral Raise"],s:[3,3,5],r:["15","15 + drop set","30-20-10-20-30"]},
-   {n:["Cable Crunch","Cable Crunch","Cable Crunch"],s:[3,3,3],r:["15","15","20"]}],
-   fin:["Ski-erg or bike 40s on / 20s off · 6 min","Ski-erg or bike 40s on / 20s off · 8 min","Ski-erg or bike 40s on / 20s off · 10 min"]}
+   {n:["Incline Bench Press","Incline Bench Press","Incline Bench Press"],s:[3,3,3],r:["10–12","10–12","10–12"],blk:"A",x:true,ss:true,top:[12,12,12],inc:2.5},
+   {n:["Chest-Supported Row","Chest-Supported Row","Chest-Supported Row"],s:[3,3,3],r:["10–12","10–12","10–12"],blk:"A",x:true,top:[12,12,12],inc:2.5},
+   {n:["Reverse Lunge (per leg)","Reverse Lunge (per leg)","Reverse Lunge (per leg)"],s:[3,3,3],r:["10/leg","10/leg","10/leg"],blk:"B",x:true,ss:true,top:[10,10,10],inc:2},
+   {n:["Kettlebell Swing","Kettlebell Swing","Kettlebell Swing"],s:[3,3,3],r:["15–20","15–20","15–20"],blk:"B",x:true,top:[20,20,20],inc:4},
+   {n:["Dips (or Decline Press)","Dips (or Decline Press)","Dips (or Decline Press)"],s:[3,3,3],r:["max","max","max + rest-pause last round"],blk:"C",ss:true},
+   {n:["Neutral Pulldown","Neutral Pulldown","Neutral Pulldown"],s:[3,3,3],r:["10–12","10–12","10–12 + rest-pause last round"],blk:"C",top:[12,12,12],inc:5},
+   {n:["Barbell Curl","Barbell Curl","Barbell Curl"],s:[3,3,3],r:["10–12 · triset →","10–12 · triset →","10–12 · triset →"],blk:"D",ss:true,top:[12,12,12],inc:2.5},
+   {n:["Rope Pressdown","Rope Pressdown","Rope Pressdown"],s:[3,3,3],r:["12–15 · triset →","12–15 + drop set last round · triset →","12–15 + drop set last round · triset →"],blk:"D",ss:true,top:[15,15,15],inc:2.5},
+   {n:["Hammer Curl","Hammer Curl","Hammer Curl"],s:[3,3,3],r:["10–12","10–12","10–12 + drop set last round"],blk:"D",top:[12,12,12],inc:2},
+   {n:["Cable Lateral Raise","Cable Lateral Raise","Cable Lateral Raise"],s:[2,2,2],r:["15","15","15 + drop set last round"],blk:"E",ss:true,top:[15,15,15],inc:2.5},
+   {n:["Cable Crunch","Cable Crunch","Cable Crunch"],s:[2,2,2],r:["15","15","15"],blk:"E",top:[15,15,15],inc:5}],
+   fin:null}
 };
 const ALLPROG=Object.assign({},PROGRAM,LEGACY);
-const SCHEMES=["Ignite · 4×10–12 · 45s rest · cardio on the first lift","Hardcore · pyramids, drop sets · 30s rest · cardio on the first two lifts","Peak · 30-20-10-20-30, rest-pause, giant sets · 30s rest"];
-const RESTS=[45,30,30];
+const SCHEMES=["Ignite · 4×10–12 · 45s rest · cardio on the first lift","Build · 45 min · supersets · 45s rest between rounds · top of the range on every set = add weight","Peak · 45 min · top set + back-offs on Block A · rest-pause on machines · drop sets on isolations"];
+const RESTS=[45,45,45];
 /* rest timer + beep */
 let actx=null,restIv=null;
 function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();const o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,actx.currentTime);o.start();o.stop(actx.currentTime+.3);}catch(e){}}
-function startRest(btn){
+function startRest(btn,secs){
   beep&&(actx=actx||new (window.AudioContext||window.webkitAudioContext)());
-  if(restIv)clearInterval(restIv);
-  let left=RESTS[phaseIdx()];
+  if(restIv){clearInterval(restIv);restIv=null;}
+  document.querySelectorAll(".rest-btn").forEach(b=>{b.classList.remove("resting");if(b.dataset.label)b.textContent=b.dataset.label;});
+  let left=secs||RESTS[phaseIdx()];
   btn.classList.add("resting");
-  const tick=()=>{btn.textContent=`Rest / cardio! ${left}s (tap to restart)`;if(left--<=0){clearInterval(restIv);restIv=null;btn.classList.remove("resting");btn.textContent=`Rest / cardio — ${RESTS[phaseIdx()]}s`;beep();toast("Go — next set");}};
+  const tick=()=>{btn.textContent=`Rest ${left}s (tap to restart)`;if(left--<=0){clearInterval(restIv);restIv=null;btn.classList.remove("resting");btn.textContent=btn.dataset.label||"Rest";beep();toast("Go — next set");}};
   tick();restIv=setInterval(tick,1000);
 }
 /* Runs: Tue/Thu from the door + Sat long run-walk. Easy = HR <=146 (Maffetone 180-34). */
@@ -259,7 +261,7 @@ const ABX=["Abs & Boxing 10: 2 rounds — 40s dead bug · 40s side plank each si
            "Abs & Boxing 10: 3 rounds of 45s each + 3× 1-min boxing rounds (jab-cross-hook, keep moving)",
            "Abs & Boxing 10: 3 rounds — 45s ab wheel / long-lever plank · 45s V-ups — + 3× 90s boxing rounds"];
 const EASY=" Easy = HR ≤146 on the Watch — walk until it drops. Quick, light steps.";
-function cardioFor(ds){const w=dowOf(ds),p=phaseOn(ds);
+function cardioFor(ds){const w=dowOf(ds),p=runPhaseOn(ds);
   if(inTrip(ds))return "Trip — hotel circuit (25 min): 5 rounds · 15 push-ups · 20 squats (pain-free depth) · 12 reverse lunges/leg · 30s plank · 30s fast march. 12k steps. Optional 20-min easy jog. Log the minutes.";
   if(ds==="2026-11-26")return "MAF 2 km retest — 10 min easy, then 2 km at HR ≤146 (walk when over). Log the time in Test (Log a different session → Test). Then "+ABX[2];
   if(ds==="2026-11-28")return "parkrun 5K, 8:00 — your first finish line. Run-walk allowed, easy first 2 km. Log time + km.";
@@ -274,6 +276,7 @@ function cardioFor(ds){const w=dowOf(ds),p=phaseOn(ds);
 function inTrip(ds){return ds>=BLOCK.tripFrom&&ds<=BLOCK.tripTo;}
 function inBlock(ds){return ds>=BLOCK.start&&ds<=BLOCK.end;}
 function phaseOn(ds){return ds>=BLOCK.p3?2:ds>=BLOCK.p2?1:0;}
+function runPhaseOn(ds){return ds>=BLOCK.runP3?2:ds>=BLOCK.runP2?1:0;}
 function phaseIdx(){return phaseOn(today());}
 function blockWeek(ds){ds=ds||today();const s=new Date(BLOCK.start+"T00:00:00"),n=new Date(ds+"T00:00:00");return Math.floor((n-s)/(7*864e5))+1;}
 /* legacy week counter (Visible Base), kept for history views */
@@ -287,8 +290,8 @@ function lastFor(name){for(let i=DB.workouts.length-1;i>=0;i--){const e=DB.worko
 function dayNote(ds){
   if(ds===BLOCK.reentry)return "Re-entry after the break — moderate loads, nothing to failure. Weigh, waist and photos first.";
   if(ds===BLOCK.start)return "Day 1 of Hardcore 7. Start at your Visible Base Phase 3 numbers.";
-  if(ds===BLOCK.p2)return "First session back from the trip: use week-1 loads today. Hardcore pyramids from Wednesday.";
-  if(ds===BLOCK.p3)return "Peak phase starts. 30-20-10-20-30 = weight up as reps drop, then back down. No rest except to change the pin.";
+  if(ds===BLOCK.v3)return "Hardcore 7 v3 starts: 45 minutes, 6:05–6:50. Straight in at your last working weights. Start the clock when you walk in.";
+  if(ds===BLOCK.p3)return "Peak starts: Block A = 1 top set ×6–8, then 3×10 at 15% lighter. Rest-pause on machines only. Drop sets on the isolations.";
   if(ds===BLOCK.light)return "Day before the test — keep everything easy.";
   if(ds>BLOCK.end)return "Hardcore 7 is complete. Block review Sat 28 Nov sets what December looks like.";
   return "";}
@@ -316,7 +319,7 @@ const SUPPORT_KEYS=["e","v","w"];
 const ALSO_TODAY=[["e","Breakfast ~7:10 · lunch 12 (biggest) · dinner done ~7:30 · kitchen closed · no snacks"],["v","with lunch"]]; /* steps now live on the Apple Watch — no double entry */
 const HLABEL=(()=>{const o={};HABITS.forEach(h=>o[h[0]]=h[1]);return o;})();
 const TRAIN_BY_DAY={2:"Strength A",3:"Run / walk — Zone 2",4:"Strength B",5:"Strength C",6:"Long walk-run"};
-const TRAIN_H7={1:"Gym · Lower + abs · 6:05",2:"Run from the door · 6:00 + abs/boxing",3:"Gym · Upper + abs · 6:05",4:"Run + strides · 6:00 + abs/boxing",5:"Gym · Full-body pump · 6:05",6:"Long run-walk · 7:00"};
+const TRAIN_H7={1:"Gym · Lower + abs · 6:05–6:50",2:"Run from the door · 6:00 + abs/boxing",3:"Gym · Upper + abs · 6:05–6:50",4:"Run + strides · 6:00 + abs/boxing",5:"Gym · Full-body pump · 6:05–6:50",6:"Long run-walk · 7:00"};
 const BUILD_H7={1:"StorytimeByMe · make · 8:00–9:15",2:"Construction · shape · 7:45–8:35",3:"Construction · make · 8:00–9:15",4:"StorytimeByMe · shape · 7:45–8:35",5:"Big rock (chosen Sunday) · 8:00–9:15"};
 function planFor(ds){const w=dowOf(ds);
   if(ds>=BLOCK.start){if(inTrip(ds))return w>=1&&w<=6?"Hotel circuit (trip)":"";if(ds===BLOCK.light)return"MAF 2 km retest · 6:00";if(ds==="2026-11-28")return"parkrun 5K · 8:00";if(ds===BLOCK.end)return"FINAL TEST + photos";return TRAIN_H7[w]||"";}
@@ -406,7 +409,28 @@ function weekGrid(){
 }
 
 /* ----- Train ----- */
-let pickedSession=null,progSess=null;
+let pickedSession=null,progSess=null,express=false,clockIv=null;
+/* 45-minute session clock (per day, survives re-renders) */
+function clockGet(){try{const c=JSON.parse(localStorage.getItem("lifeos-clock")||"null");return c&&c.d===today()?c.t:null;}catch(e){return null;}}
+function clockStart(){try{localStorage.setItem("lifeos-clock",JSON.stringify({d:today(),t:Date.now()}));}catch(e){}clockTick();}
+function clockTick(){const el=document.getElementById("clock");if(!el)return;const t=clockGet();
+  if(!t){el.textContent="45:00 · tap to start";el.style.color="";return;}
+  const left=Math.round((45*60e3-(Date.now()-t))/1000);
+  if(left<=0){el.textContent="Time — walk out, home by 7:00";el.style.color="var(--warn)";return;}
+  el.textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,"0")} left`;el.style.color=left<300?"var(--warn)":"";}
+let clockTap=0;function confirmRestart(){const n=Date.now();if(n-clockTap<3000){clockTap=0;return true;}clockTap=n;toast("Tap again to restart the clock");return false;}
+/* progression hint: top of the range on every set -> add weight; otherwise beat one */
+function targetFor(e,p,last){
+  if(!last||!last.sets.length)return "First time: pick a weight that lands you in the rep range.";
+  const sets=last.sets,heavy=Math.max(...sets.map(x=>x.w));
+  if(e.pk&&p===2){const top=sets.reduce((a,x)=>x.w>a.w?x:a,sets[0]);
+    return top.r>=8?`⬆ Top set: go ${+(top.w+e.inc).toFixed(1)} kg × 6–8`:`Top set: ${top.w} kg × ${top.r+1}`;}
+  const t=e.top?e.top[p]:null;
+  if(!t)return "Beat one: one more rep on any set.";
+  const done=sets.length>=e.s[p]&&sets.every(x=>x.r>=t);
+  if(done&&e.inc)return `⬆ Every set hit ${t} — go ${+(heavy+e.inc).toFixed(1)} kg today`;
+  if(done)return `Every set hit ${t} — add reps or slow the lowering`;
+  return `Beat one: ${heavy} kg, one more rep on any set (top of range ${t})`;}
 const KNEE=`<p class="muted" style="margin:-2px 0 10px">Knee: 0–3/10 carry on · 4–5 cut load or range by a third · above 5, or worse next morning → swap it this week.</p>`;
 function renderTrain(){
   const td=today(),dow=new Date().getDay();
@@ -437,23 +461,31 @@ function renderTrain(){
   }
   const p=phaseIdx(),prog=PROGRAM[sess],note=dayNote(td);
   const wk=td>=BLOCK.start&&td<=BLOCK.end?`W${blockWeek(td)} · `:"";
-  html+=`<div class="card"><h2>${prog.name}<span class="sub">${wk}${SCHEMES[p]}</span></h2>`;
+  html+=`<div class="card"><h2>${prog.name}${express?" · Express 20":""}<span class="sub">${wk}${SCHEMES[p]}</span></h2>`;
   if(note)html+=`<p class="muted" style="margin:-4px 0 10px;color:var(--warn)">${note}</p>`;
+  html+=`<button class="btn secondary" id="clock-btn" style="margin-bottom:6px"><span id="clock">45:00</span></button>
+    <p class="muted" style="margin:0 0 8px">Walk out at 6:50 whatever is left. Running short: drop the last round of the final block first. Never cut A or B.</p>
+    <p class="muted" style="margin:0 0 8px">Effort is your call on the day: push hard when you've slept and recovered, ease off when you haven't.${p>=1?" <b>Drop set:</b> finish the set, take 20–25% off, go straight into 6–10 more clean reps. Never on barbells.":""}</p>
+    <button class="btn small secondary" id="x-btn" style="margin-bottom:10px">${express?"Show the full 45":"Late or low energy? Express 20 (Block A + B only)"}</button>`;
   if(sess==="L1"||sess==="L2")html+=KNEE;
   prog.ex.forEach((e,ei)=>{
+    if(express&&!e.x)return;
     const name=e.n[p],nsets=e.s[p],last=lastFor(name);
     const lastStr=last?last.sets.map(s=>`${s.w}×${s.r}`).join("  ")+` <span style="opacity:.6">· ${last.date.slice(5)}</span>`:"—";
     html+=`<div class="ex" style="${e.ss?"margin-bottom:3px;border-left:3px solid var(--accent2)":""}${ei>0&&prog.ex[ei-1].ss?";border-left:3px solid var(--accent2)":""}">
-      <div class="name">${name}</div><div class="scheme">${nsets} sets · ${e.r[p]}${e.ss?" · superset ↓":""}</div><div class="last">Last: ${lastStr}</div><div class="sets">`;
+      <div class="name">${e.blk?`<b style="color:var(--accent2)">${e.blk}</b> · `:""}${name}</div><div class="scheme">${nsets} ${e.blk&&e.blk!=="A"||!e.pk?"rounds":"sets"} · ${e.r[p]}${e.ss?" · superset ↓":""}</div><div class="last">Last: ${lastStr}</div><div class="last" style="color:var(--accent2)">${targetFor(e,p,last)}</div><div class="sets">`;
     for(let s=0;s<nsets;s++)html+=`<span class="set"><input type="number" inputmode="decimal" placeholder="kg" data-e="${ei}" data-s="${s}" data-t="w"><span>×</span><input type="number" inputmode="numeric" placeholder="reps" data-e="${ei}" data-s="${s}" data-t="r"></span>`;
     html+=`</div></div>`;
   });
-  if(prog.fin)html+=`<div class="ex" style="border:1px dashed var(--accent2)"><div class="name">Finisher</div><div class="scheme">${prog.fin[p]}</div></div>`;
-  html+=`<button class="btn secondary" id="rest-btn" style="margin-bottom:8px">Rest / cardio — ${RESTS[p]}s</button>`;
+  if(prog.fin&&!express)html+=`<div class="ex" style="border:1px dashed var(--accent2)"><div class="name">Finisher</div><div class="scheme">${prog.fin[p]}</div></div>`;
+  html+=`<div class="row" style="gap:8px;margin-bottom:8px"><button class="btn secondary rest-btn" data-secs="90" data-label="Rest 90s · Block A">Rest 90s · Block A</button><button class="btn secondary rest-btn" data-secs="45" data-label="Rest 45s · after a round">Rest 45s · after a round</button></div>`;
   html+=`<button class="btn" id="w-save">Finish & save workout</button></div>`;
   html+=pickButtons(sess);
   view.innerHTML=html;
-  document.getElementById("rest-btn").onclick=function(){startRest(this);};
+  view.querySelectorAll(".rest-btn").forEach(b=>b.onclick=function(){startRest(this,+this.dataset.secs);});
+  document.getElementById("clock-btn").onclick=()=>{if(!clockGet()||confirmRestart())clockStart();};
+  document.getElementById("x-btn").onclick=()=>{express=!express;render();};
+  clockTick();if(!clockIv)clockIv=setInterval(clockTick,1000);
   document.getElementById("w-save").onclick=()=>{
     const entries=[];
     PROGRAM[sess].ex.forEach((e,ei)=>{
@@ -463,7 +495,7 @@ function renderTrain(){
         if(wi.value!==""&&ri.value)sets.push({w:+wi.value,r:+ri.value});});
       if(sets.length)entries.push({ex:name,sets});});
     if(!entries.length){toast("Nothing entered yet");return;}
-    DB.workouts.push({date:today(),session:sess,phase:p+1,block:"H7",entries});
+    DB.workouts.push({date:today(),session:sess,phase:p+1,block:"H7",v:3,express:express||undefined,entries});express=false;
     DB.habits[today()]=DB.habits[today()]||{};DB.habits[today()].t=true;
     save();pickedSession=null;toast("Workout saved 💪");tab="progress";setNav();render();
   };
@@ -897,7 +929,7 @@ function blockTile(){const td=today();
   if(td<BLOCK.start)return{v:"H7",l:"starts<br>Mon 12 Oct"};
   if(td>BLOCK.end)return{v:"✓",l:"Hardcore 7<br>complete"};
   if(inTrip(td))return{v:"W"+blockWeek(td),l:"trip<br>hold the line"};
-  return{v:"W"+blockWeek(td),l:["Ignite","Hardcore","Peak"][phaseIdx()]+"<br>phase"};}
+  return{v:"W"+blockWeek(td),l:["Ignite","Build","Peak"][phaseIdx()]+"<br>phase"};}
 function sheetProgram(){
   const T=[...(DB.tests||[])].sort((a,b)=>a.date<b.date?-1:1);
   const h7=DB.workouts.filter(w=>w.block==="H7").length;
@@ -906,8 +938,9 @@ function sheetProgram(){
     <div class="kv"><span>Week</span><span>${today()<BLOCK.start?"starts 12 Oct":Math.min(7,blockWeek())+" of 7"}</span></div>
     <div class="kv"><span>Ignite</span><span>12–20 Oct</span></div>
     <div class="kv"><span>Trip (deload)</span><span>21–25 Oct</span></div>
-    <div class="kv"><span>Hardcore</span><span>26 Oct – 8 Nov</span></div>
-    <div class="kv"><span>Peak</span><span>9–25 Nov</span></div>
+    <div class="kv"><span>Build (45-min sessions)</span><span>2–15 Nov</span></div>
+    <div class="kv"><span>Peak</span><span>16–25 Nov</span></div>
+    <div class="kv"><span>Runs</span><span>30 min to 8 Nov · 35 min from 9 Nov</span></div>
     <div class="kv"><span>Final test · parkrun 5K</span><span>Fri 27 · Sat 28 Nov</span></div>
     <div class="kv"><span>Week shape</span><span>Gym Mon/Wed/Fri · Run Tue/Thu/Sat</span></div>
     <div class="kv"><span>Running, last 7 days</span><span>${runKm7()} km</span></div>
